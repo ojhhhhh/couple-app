@@ -1,5 +1,5 @@
 /* ========== REST API Adapter (replaces Firebase) ========== */
-const API_BASE = 'http://localhost:3456';
+const API_BASE = '';
 
 // Simple UID generator (no auth needed)
 const _uidKey = '_couple_uid';
