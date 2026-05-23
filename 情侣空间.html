@@ -424,9 +424,319 @@ footer button:active{background:var(--accent);color:#fff;border-color:var(--acce
 .btn-danger{background:none;border:none;color:#D06060;cursor:pointer;font-size:0.8rem}
 .delete-btn{background:none;border:none;color:var(--accent-strong);cursor:pointer;font-size:0.78rem}
 input[type="file"]{display:none}
+
+/* ═══════════════════════════════════════════════
+   线条小狗 Kawaii 美化系统
+   ═══════════════════════════════════════════════ */
+
+/* -- Extended Kawaii Palette -- */
+:root{
+  --kawaii-pink:#FFD1DC;--kawaii-lavender:#E8D5F5;--kawaii-mint:#D4F0E8;
+  --kawaii-peach:#FFE4D0;--kawaii-sky:#D6EAF8;--kawaii-lemon:#FFF6D5;
+  --kawaii-rose:#FFD4D4;--kawaii-lilac:#EDE0F5;--kawaii-coral:#FFD9D0;
+  --kawaii-cream:#FFFBF5;--kawaii-cocoa:#C8A896;
+  --deco-opacity:0.18;
+}
+
+/* -- Sakura Petal Fall -- */
+.sakura-container{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.sakura-petal{
+  position:absolute;top:-60px;animation:sakuraFall linear infinite;
+  opacity:0.5;font-size:1.2rem;filter:blur(0.5px);
+}
+@keyframes sakuraFall{
+  0%{transform:translateY(-5vh) rotate(0deg) translateX(0);opacity:0.55}
+  25%{transform:translateY(25vh) rotate(90deg) translateX(30px);opacity:0.45}
+  50%{transform:translateY(50vh) rotate(180deg) translateX(-20px);opacity:0.5}
+  75%{transform:translateY(75vh) rotate(270deg) translateX(25px);opacity:0.4}
+  100%{transform:translateY(105vh) rotate(360deg) translateX(-15px);opacity:0.2}
+}
+
+/* -- Floating Kawaii Deco -- */
+.kawaii-float{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.kawaii-bubble{
+  position:absolute;bottom:-60px;animation:bubbleRise linear infinite;
+  opacity:0.3;font-size:1rem;
+}
+@keyframes bubbleRise{
+  0%{transform:translateY(0) translateX(0) scale(0.6);opacity:0.35}
+  30%{opacity:0.3}
+  70%{opacity:0.2}
+  100%{transform:translateY(-110vh) translateX(60px) scale(1.1);opacity:0}
+}
+
+/* -- Cursor Trail Hearts -- */
+.heart-trail{
+  position:fixed;pointer-events:none;z-index:9999;
+  animation:heartTrail 0.7s ease-out forwards;
+  font-size:1.1rem;
+}
+@keyframes heartTrail{
+  0%{opacity:1;transform:translateY(0) scale(1)}
+  100%{opacity:0;transform:translateY(-45px) scale(0.2) rotate(20deg)}
+}
+
+/* -- Card Deco Borders -- */
+.card::before{
+  content:'';position:absolute;top:6px;left:10px;right:10px;height:2px;
+  background:repeating-linear-gradient(90deg,var(--kawaii-pink) 0px,var(--kawaii-pink) 6px,transparent 6px,transparent 12px);
+  border-radius:2px;opacity:0.5;z-index:1;
+}
+.card::after{
+  content:'';position:absolute;bottom:6px;left:10px;right:10px;height:2px;
+  background:repeating-linear-gradient(90deg,var(--kawaii-lavender) 0px,var(--kawaii-lavender) 6px,transparent 6px,transparent 12px);
+  border-radius:2px;opacity:0.5;z-index:1;
+}
+
+/* -- Washi Tape Corner -- */
+.washi-corner{
+  position:absolute;top:-4px;right:12px;width:30px;height:18px;
+  background:var(--kawaii-pink);opacity:0.7;border-radius:2px;
+  transform:rotate(8deg);z-index:2;
+  box-shadow:0 1px 2px rgba(0,0,0,0.06);
+}
+
+/* -- Ribbon Bow Decoration -- */
+.ribbon-bow{
+  display:inline-block;position:relative;font-size:1.3rem;
+  animation:bowBounce 2.5s ease-in-out infinite;
+}
+@keyframes bowBounce{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+
+/* -- Glowing Heart -- */
+.glowing-heart{
+  display:inline-block;
+  animation:glowPulse 1.8s ease-in-out infinite;
+}
+@keyframes glowPulse{
+  0%,100%{filter:drop-shadow(0 0 3px rgba(232,120,120,0.5))}
+  50%{filter:drop-shadow(0 0 8px rgba(232,120,120,0.8))}
+}
+
+/* -- Title Sparkle -- */
+.sparkle-star{
+  position:absolute;pointer-events:none;opacity:0;
+  animation:starTwinkle 1.5s ease-in-out infinite;
+  font-size:0.7rem;
+}
+@keyframes starTwinkle{
+  0%,100%{opacity:0;transform:scale(0.5)}
+  50%{opacity:0.9;transform:scale(1.3)}
+}
+
+/* -- Shimmer Text Effect -- */
+.shimmer-text{
+  background:linear-gradient(90deg,var(--text),var(--accent-strong),var(--pink-deep),var(--text));
+  background-size:300% 100%;-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;background-clip:text;
+  animation:shimmer 4s ease-in-out infinite;
+}
+@keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+/* -- Wavy Divider -- */
+.wavy-divider{
+  height:8px;margin:4px 20px;
+  background:repeating-linear-gradient(135deg,transparent,transparent 3px,var(--kawaii-pink) 3px,var(--kawaii-pink) 5px);
+  border-radius:4px;opacity:0.45;
+}
+
+/* -- Bouncy Button -- */
+.bouncy-btn:active{animation:btnBounce 0.3s ease}
+@keyframes btnBounce{0%{transform:scale(1)}40%{transform:scale(0.88)}70%{transform:scale(1.04)}100%{transform:scale(1)}}
+
+/* -- Rainbow Border Glow for special cards -- */
+.card.magic-glow{
+  animation:magicGlow 3s ease-in-out infinite;
+}
+@keyframes magicGlow{
+  0%,100%{box-shadow:0 2px 12px rgba(240,180,180,0.15),0 0 0 1px rgba(240,180,180,0.1)}
+  33%{box-shadow:0 2px 12px rgba(200,180,240,0.2),0 0 0 1px rgba(200,180,240,0.15)}
+  66%{box-shadow:0 2px 12px rgba(180,220,240,0.2),0 0 0 1px rgba(180,220,240,0.15)}
+}
+
+/* -- Kawaii Scrollbar -- */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--kawaii-cream)}
+::-webkit-scrollbar-thumb{background:var(--kawaii-pink);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+
+/* -- Ringing Notification Bell -- */
+.notif-bell{display:inline-block;animation:bellRing 0.6s ease-in-out infinite;animation-play-state:paused}
+.notif-bell.active{animation-play-state:running}
+@keyframes bellRing{
+  0%,100%{transform:rotate(0)}
+  20%{transform:rotate(15deg)}
+  40%{transform:rotate(-15deg)}
+  60%{transform:rotate(10deg)}
+  80%{transform:rotate(-5deg)}
+}
+
+/* -- Decorated HR / Separator -- */
+.cute-sep{
+  text-align:center;margin:12px 0;font-size:0.75rem;letter-spacing:3px;
+  color:var(--text-sub);opacity:0.5;user-select:none;
+}
+
+/* -- Kawaii Swirl Background -- */
+.swirl-bg{
+  position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:0.03;
+  background:
+    radial-gradient(ellipse at 15% 25%,#F0B4B4 0%,transparent 60%),
+    radial-gradient(ellipse at 85% 40%,#C8B4E0 0%,transparent 60%),
+    radial-gradient(ellipse at 50% 70%,#B4D4E0 0%,transparent 60%),
+    radial-gradient(ellipse at 25% 85%,#F0D4B4 0%,transparent 60%);
+}
+
+/* -- Stamp/Seal Effect -- */
+.stamp-seal{
+  display:inline-flex;align-items:center;justify-content:center;
+  border:3px solid var(--accent-strong);border-radius:50%;
+  width:52px;height:52px;font-size:1.5rem;color:var(--accent-strong);
+  transform:rotate(-12deg);opacity:0.7;font-weight:900;
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* -- Decoration String (garland) -- */
+.garland{
+  display:flex;justify-content:center;gap:6px;padding:6px 0;
+  font-size:0.6rem;letter-spacing:2px;opacity:0.55;user-select:none;
+}
+
+/* -- Tilt on Hover for Cards -- */
+@media(hover:hover){
+  .card.tilt:hover{transform:rotate(-0.3deg) scale(1.01);transition:transform 0.3s}
+}
+
+/* -- Confetti Pop -- */
+.confetti-piece{
+  position:fixed;pointer-events:none;z-index:9999;
+  animation:confettiBurst 1.2s ease-out forwards;
+  font-size:1rem;
+}
+@keyframes confettiBurst{
+  0%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}
+  100%{opacity:0;transform:translate(var(--cx),var(--cy)) rotate(var(--cr)) scale(0.3)}
+}
+
+/* -- Notification Badge with wiggle -- */
+.badge-wiggle{
+  display:inline-block;animation:badgeWiggle 0.5s ease-in-out 3;
+}
+@keyframes badgeWiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-15deg)}75%{transform:rotate(15deg)}}
+
+/* -- Kawaii Loading Skeleton -- */
+.skeleton-pulse{
+  animation:skeletonShimmer 1.6s ease-in-out infinite;
+  background:linear-gradient(90deg,var(--kawaii-pink) 0%,var(--kawaii-cream) 40%,var(--kawaii-pink) 80%);
+  background-size:200% 100%;border-radius:8px;height:14px;opacity:0.4;
+}
+@keyframes skeletonShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* -- Petal Decorative Border for special cards -- */
+.petal-border{
+  position:relative;
+}
+.petal-border::before{
+  content:'🌸';position:absolute;top:-10px;left:10px;font-size:0.9rem;z-index:2;
+}
+.petal-border::after{
+  content:'🌸';position:absolute;bottom:-10px;right:10px;font-size:0.9rem;z-index:2;
+}
+
+/* -- Heart Decorative Border -- */
+.heart-border-top{
+  text-align:center;margin:0 14px;position:relative;height:12px;
+  background:radial-gradient(circle at center,var(--kawaii-pink) 3px,transparent 4px);
+  background-size:24px 12px;opacity:0.5;
+}
+
+/* -- Button Group Sparkle Container -- */
+.btn-sparkle-wrap{position:relative;display:inline-block}
+.btn-sparkle-wrap .btn-sparkle{
+  position:absolute;pointer-events:none;font-size:0.6rem;
+  animation:btnSparklePop 1.4s ease-in-out infinite;
+  opacity:0;
+}
+@keyframes btnSparklePop{0%,100%{opacity:0;transform:translate(0,0) scale(0)}50%{opacity:0.9;transform:translate(var(--sx),var(--sy)) scale(1)}}
+
+/* -- Toast with sparkle -- */
+#notify-toast.sparkle-toast{
+  background:linear-gradient(135deg,var(--accent-strong),var(--pink-deep));
+  box-shadow:0 4px 20px rgba(232,120,120,0.4),0 0 0 4px rgba(255,200,200,0.2);
+}
+
+/* -- Moon & Star decorative -- */
+.moon-star-deco{
+  position:fixed;pointer-events:none;z-index:0;opacity:0.12;
+  font-size:2rem;animation:moonDrift 20s ease-in-out infinite;
+}
+@keyframes moonDrift{
+  0%,100%{transform:translate(0,0)}
+  25%{transform:translate(15px,-8px)}
+  50%{transform:translate(5px,-3px)}
+  75%{transform:translate(-5px,-12px)}
+}
+
+/* -- Cute Tag / Label Pill -- */
+.tag-pill{
+  display:inline-block;padding:2px 10px;border-radius:999px;
+  font-size:0.7rem;font-weight:650;letter-spacing:0.5px;
+  background:var(--kawaii-pink);color:var(--text);
+}
+.tag-pill.new{background:var(--kawaii-mint);color:#3B7A5E}
+.tag-pill.hot{background:var(--kawaii-coral);color:#B84030}
+
+/* -- Dotted Line Decoration -- */
+.dot-line{
+  height:0;border-top:2px dotted var(--kawaii-pink);
+  margin:8px 0;opacity:0.6;
+}
+
+/* -- Envelope seal heart -- */
+.heart-seal{
+  display:inline-block;position:relative;
+}
+.heart-seal::after{
+  content:'💌';position:absolute;top:-6px;right:-18px;font-size:0.8rem;
+  animation:sealFloat 3s ease-in-out infinite;
+}
+@keyframes sealFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* -- Greeting Card effect -- */
+.greeting-card{
+  position:relative;
+  background:linear-gradient(135deg,var(--kawaii-cream) 0%,var(--kawaii-rose) 100%);
+  border:1px solid rgba(240,180,180,0.3);
+}
+.greeting-card::after{
+  content:'♡';position:absolute;bottom:-14px;right:16px;
+  font-size:1.4rem;color:var(--accent-strong);opacity:0.5;
+}
+
+/* -- Puppy Paw Loading -- */
+.paw-loading{
+  display:inline-flex;gap:6px;
+}
+.paw-loading span{
+  animation:pawStep 0.4s ease-in-out infinite;
+  font-size:0.8rem;
+}
+.paw-loading span:nth-child(2){animation-delay:0.1s}
+.paw-loading span:nth-child(3){animation-delay:0.2s}
+@keyframes pawStep{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* ========== End Kawaii System ========== */
 </style>
 </head>
 <body>
+
+<!-- Kawaii Background Decorations -->
+<div class="swirl-bg"></div>
+<div class="sakura-container" id="sakura-container"></div>
+<div class="kawaii-float" id="kawaii-float"></div>
+<div class="moon-star-deco" style="top:8%;right:6%" id="moon-deco">🌙</div>
+<div class="moon-star-deco" style="bottom:15%;left:4%;font-size:1.4rem;animation-delay:-7s">⭐</div>
+<div class="moon-star-deco" style="top:45%;right:8%;font-size:1rem;animation-delay:-14s">✨</div>
 
 <!-- Auth Screen -->
 <div id="auth-screen">
@@ -473,6 +783,8 @@ input[type="file"]{display:none}
   <img id="puppy-img" src="" alt="线条小狗">
 </div>
 
+<div class="cute-sep">‧₊˚ ✩ ♡ 🐾 ♡ ✩ ˚₊‧</div>
+
 <!-- Public Dynamic (couple fortune) -->
 <section class="card" id="public-dynamic-card">
   <h3><span class="puppy-icon">🐾</span> 每日灵签 <span class="puppy-bone">🦴</span></h3>
@@ -492,6 +804,8 @@ input[type="file"]{display:none}
     <button id="refresh-message" style="background:none;border:none;color:var(--accent-strong);cursor:pointer;font-size:0.8rem">🔄 换一句</button>
   </div>
 </section>
+
+<div class="cute-sep">♡ •˚ 🦴 ˚• ♡</div>
 
 <!-- Schedule -->
 <section class="card" id="schedule-card">
@@ -536,9 +850,11 @@ input[type="file"]{display:none}
   <div id="together-display"></div>
 </section>
 
+<div class="cute-sep">✧ ˚₊‧ ♡ 💍 ♡ ‧₊˚ ✧</div>
+
 <!-- Anniversary -->
-<section class="card" id="anniversary-card">
-  <h3><span class="puppy-icon">🐾</span> 纪念日 <span class="puppy-bone">🦴</span></h3>
+<section class="card petal-border" id="anniversary-card">
+  <h3><span class="puppy-icon">🐾</span> <span class="glowing-heart">💖</span> 纪念日 <span class="puppy-bone">🦴</span></h3>
   <div id="anniversary-display"></div>
 </section>
 
@@ -671,6 +987,7 @@ const Auth = {
     }
     if(!partnerUid) return;
     await Sync.listenPartner();
+    KawaiiDeco.celebrate();
     this.showMainApp();
   },
 
@@ -1695,10 +2012,170 @@ const App={
   }
 };
 
+/* ═══════════════════════════════════════════════
+   Kawaii Decoration Engine
+   ═══════════════════════════════════════════════ */
+const KawaiiDeco = {
+  sakuraEmojis: ['🌸','💮','🌺','🍀','🌷','🪷','✿','❀','🌼','💐','🌾','🍂','🌿'],
+  bubbleEmojis: ['💗','💖','💝','💕','💓','🫧','✨','⭐','🌟','💫','🩷','🐾','🎀','🦴','💎','🍬','🍭'],
+  trailEmojis: ['💗','💕','💖','🩷','✨','💝','🐾','🎀','💫'],
+
+  init(){
+    this.startSakura();
+    this.startBubbles();
+    this.startClickTrail();
+    this.startTitleSparkles();
+    this.startGarlandTwinkle();
+    this.addCardDecorations();
+  },
+
+  startSakura(){
+    const container = document.getElementById('sakura-container');
+    if(!container) return;
+    // Spawn initial petals
+    for(let i=0; i<14; i++){
+      this._spawnPetal(container, Math.random()*15);
+    }
+    // Periodically add more
+    setInterval(()=>{
+      if(document.hidden) return;
+      this._spawnPetal(container, 0);
+    }, 2800);
+  },
+
+  _spawnPetal(container, delay){
+    const petal = document.createElement('span');
+    petal.className = 'sakura-petal';
+    petal.textContent = this.sakuraEmojis[Math.floor(Math.random()*this.sakuraEmojis.length)];
+    petal.style.left = Math.random()*95+'%';
+    petal.style.fontSize = (0.8 + Math.random()*1.6)+'rem';
+    petal.style.animationDuration = (10 + Math.random()*18)+'s';
+    petal.style.animationDelay = delay+'s';
+    petal.style.opacity = (0.2 + Math.random()*0.4);
+    container.appendChild(petal);
+    // Remove after animation ends
+    setTimeout(()=>{ if(petal.parentNode) petal.remove(); }, (28+delay)*1000);
+  },
+
+  startBubbles(){
+    const container = document.getElementById('kawaii-float');
+    if(!container) return;
+    const spawnBubble = () => {
+      if(document.hidden) return;
+      const bubble = document.createElement('span');
+      bubble.className = 'kawaii-bubble';
+      bubble.textContent = this.bubbleEmojis[Math.floor(Math.random()*this.bubbleEmojis.length)];
+      bubble.style.left = (5 + Math.random()*90)+'%';
+      bubble.style.fontSize = (0.7 + Math.random()*1.5)+'rem';
+      bubble.style.animationDuration = (6 + Math.random()*14)+'s';
+      bubble.style.opacity = (0.1 + Math.random()*0.3);
+      container.appendChild(bubble);
+      setTimeout(()=>{ if(bubble.parentNode) bubble.remove(); }, 20000);
+    };
+    for(let i=0; i<8; i++) setTimeout(spawnBubble, i*800);
+    setInterval(spawnBubble, 3500);
+  },
+
+  startClickTrail(){
+    document.addEventListener('click', e => {
+      const emoji = this.trailEmojis[Math.floor(Math.random()*this.trailEmojis.length)];
+      const heart = document.createElement('span');
+      heart.className = 'heart-trail';
+      heart.textContent = emoji;
+      heart.style.left = e.clientX+'px';
+      heart.style.top = e.clientY+'px';
+      document.body.appendChild(heart);
+      setTimeout(()=> heart.remove(), 750);
+    });
+  },
+
+  startTitleSparkles(){
+    // Add sparkle stars around titles periodically
+    const container = document.getElementById('sparkles');
+    if(!container) return;
+    const spawn = () => {
+      if(document.hidden) return;
+      const star = document.createElement('span');
+      star.className = 'sparkle-star';
+      star.textContent = ['✦','✧','⋆','˚','✶','✷','✸'][Math.floor(Math.random()*7)];
+      star.style.left = (3+Math.random()*94)+'%';
+      star.style.top = (5+Math.random()*90)+'%';
+      star.style.animationDuration = (1+Math.random()*2.5)+'s';
+      star.style.animationDelay = Math.random()*1.5+'s';
+      container.appendChild(star);
+      setTimeout(()=> star.remove(), 4000);
+    };
+    for(let i=0; i<12; i++) setTimeout(spawn, i*600);
+    setInterval(spawn, 3000);
+  },
+
+  startGarlandTwinkle(){
+    // Add subtle twinkling to existing decoration elements
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card,i) => {
+      if(i%3===0) card.classList.add('magic-glow');
+    });
+  },
+
+  addCardDecorations(){
+    // Add washi tape corners to some cards
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card,i) => {
+      if(i%2===0 && !card.id){
+        const tape = document.createElement('div');
+        tape.className = 'washi-corner';
+        tape.style.background = ['#FFD1DC','#E8D5F5','#D4F0E8','#FFE4D0','#D6EAF8'][i%5];
+        card.appendChild(tape);
+      }
+    });
+  },
+
+  // Call when couple pairs — celebratory confetti
+  celebrate(){
+    const emojis = '🎉🎊💕💗💖✨🌟💝🩷🎀💫🐶🐾'.split('');
+    for(let i=0; i<35; i++){
+      setTimeout(()=>{
+        const piece = document.createElement('span');
+        piece.className = 'confetti-piece';
+        piece.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        piece.style.left = (5+Math.random()*90)+'%';
+        piece.style.top = (10+Math.random()*50)+'%';
+        piece.style.setProperty('--cx',((Math.random()-0.5)*280)+'px');
+        piece.style.setProperty('--cy',(-100-Math.random()*300)+'px');
+        piece.style.setProperty('--cr',(Math.random()*720-360)+'deg');
+        document.body.appendChild(piece);
+        setTimeout(()=>piece.remove(), 1300);
+      }, i*40);
+    }
+  },
+
+  // Burst hearts from a specific element
+  burstFrom(el){
+    const rect = el.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+    for(let i=0; i<12; i++){
+      const heart = document.createElement('span');
+      heart.className = 'confetti-piece';
+      heart.textContent = ['💗','💕','💖','✨','💝'][i%5];
+      heart.style.left = cx+'px';
+      heart.style.top = cy+'px';
+      heart.style.setProperty('--cx',((Math.random()-0.5)*200)+'px');
+      heart.style.setProperty('--cy',(-60-Math.random()*180)+'px');
+      heart.style.setProperty('--cr',(Math.random()*360-180)+'deg');
+      document.body.appendChild(heart);
+      setTimeout(()=>heart.remove(), 1300);
+    }
+  }
+};
+
 /* ========== Boot ========== */
 window.addEventListener('DOMContentLoaded',()=>{
   // Lightbox close
   document.getElementById('photo-lightbox').addEventListener('click',function(e){ if(e.target===this||e.target.classList.contains('lightbox-close')) this.classList.add('hidden'); });
+
+  // Init kawaii decoration engine
+  KawaiiDeco.init();
 
   // Start auth flow
   Auth.init();
