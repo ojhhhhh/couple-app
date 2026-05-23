@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#FFF5F0">
+<title>情侣空间 · 小窝</title>
+<style>
+/* ═══════════════════════════════════════════════
+   CSS Variables & Reset
+   ═══════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#FFF9F5;--card-bg:#FFFCF8;--text:#5C3B2E;--text-sub:#A08878;
+  --accent:#F0B4B4;--accent-strong:#E89090;--pink:#F9C5C5;--pink-deep:#E8A0A0;
+  --boy-color:#8BA4C7;--girl-color:#F0A8B0;--heart:#E87878;
+  --radius:16px;--radius-sm:10px;
+  --font:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+body{
+  font-family:var(--font);background:var(--bg);color:var(--text);
+  max-width:480px;margin:0 auto;min-height:100dvh;
+  position:relative;overflow-x:hidden;
+  background-image:
+    radial-gradient(circle at 20% 10%,rgba(240,180,180,0.12) 0%,transparent 50%),
+    radial-gradient(circle at 80% 90%,rgba(200,180,220,0.1) 0%,transparent 50%),
+    linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0) 19px,rgba(240,220,210,0.25) 20px),
+    linear-gradient(90deg,rgba(200,40,40,0.04) 0%,rgba(200,40,40,0.04) 1px,transparent 1px);
+  background-size:100% 100%,100% 100%,100% 20px,100% 100%;
+}
+
+/* Auth Screen */
+#auth-screen{position:fixed;inset:0;z-index:9999;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  padding:2rem;text-align:center;
+}
+#auth-screen.hidden{display:none}
+.auth-icon{font-size:5rem;margin-bottom:1rem;animation:authBounce 2s ease infinite}
+@keyframes authBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.auth-title{font-size:1.6rem;font-weight:700;color:var(--text);margin-bottom:0.4rem}
+.auth-sub{font-size:0.9rem;color:var(--text-sub);margin-bottom:1.8rem}
+.auth-btn{
+  display:block;width:100%;max-width:260px;margin:0.5rem auto;padding:16px 24px;
+  border:none;border-radius:999px;font-size:1.1rem;font-weight:650;cursor:pointer;
+  transition:transform 0.15s,box-shadow 0.15s;letter-spacing:1px;
+}
+.auth-btn:active{transform:scale(0.96)}
+.auth-btn.boy{background:linear-gradient(135deg,#8BA4C7,#6B8DB8);color:#fff;box-shadow:0 4px 18px rgba(107,141,184,0.35)}
+.auth-btn.girl{background:linear-gradient(135deg,#F0A8B0,#E88898);color:#fff;box-shadow:0 4px 18px rgba(232,136,152,0.35)}
+.auth-pair{display:none;margin-top:1.2rem}
+.auth-pair.active{display:block}
+.auth-pair input{
+  width:180px;padding:12px 16px;border:2px solid #e8d8d0;border-radius:999px;
+  font-size:1.1rem;text-align:center;letter-spacing:4px;font-weight:700;
+  background:var(--card-bg);outline:none;transition:border-color 0.2s;
+}
+.auth-pair input:focus{border-color:var(--accent-strong)}
+.auth-pair button{
+  display:block;margin:12px auto 0;padding:10px 32px;border:none;
+  border-radius:999px;background:var(--heart);color:#fff;font-size:1rem;
+  cursor:pointer;font-weight:600;
+}
+.pair-code-display{
+  margin-top:1rem;padding:14px 24px;background:var(--card-bg);border-radius:var(--radius);
+  border:2px dashed var(--accent-strong);display:inline-block;
+}
+.pair-code-display .code{font-size:2rem;font-weight:800;letter-spacing:6px;color:var(--heart)}
+.pair-code-display .hint{font-size:0.8rem;color:var(--text-sub);margin-top:4px}
+
+/* Partner Bar */
+#partner-bar{
+  display:none;align-items:center;gap:10px;padding:10px 16px;
+  background:var(--card-bg);border-bottom:1px solid #f0e8e0;
+  font-size:0.85rem;position:sticky;top:0;z-index:100;
+}
+#partner-bar.active{display:flex}
+#partner-bar .online-dot{
+  width:9px;height:9px;border-radius:50%;background:#ccc;flex-shrink:0;
+  transition:background 0.4s;
+}
+#partner-bar .online-dot.live{background:#6BC070;box-shadow:0 0 6px rgba(107,192,112,0.5)}
+#partner-bar .partner-name{font-weight:650;flex:1}
+#partner-bar .partner-mood{font-size:1.2rem}
+
+/* Hero */
+#hero{padding:18px 18px 12px;text-align:center;transition:background 0.5s}
+#hero.hero-morning{background:linear-gradient(180deg,#FFF8E7,#FFF9F5)}
+#hero.hero-day{background:linear-gradient(180deg,#FFFCF5,#FFF9F5)}
+#hero.hero-evening{background:linear-gradient(180deg,#FFF5F0,#FFF9F5)}
+#hero.hero-night{background:linear-gradient(180deg,#F5F0F8,#FFF9F5)}
+#hero.hero-late{background:linear-gradient(180deg,#F0E8F4,#FFF9F5)}
+#greeting-text{font-size:1.2rem;font-weight:650;margin-bottom:8px}
+#weather-card{font-size:0.82rem;color:var(--text-sub);display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center}
+.weather-tip{width:100%;font-size:0.78rem;color:var(--accent-strong);margin-top:2px}
+
+/* Puppy Zone */
+#puppy-zone{position:relative;text-align:center;padding:4px 0 16px;min-height:160px}
+#puppy-img{width:140px;cursor:grab;transition:transform 0.1s;user-select:none;-webkit-user-drag:none}
+#puppy-img.dragging{cursor:grabbing;transform:scale(1.08)}
+#puppy-speech{
+  display:inline-block;position:relative;background:var(--card-bg);color:var(--text);
+  padding:8px 16px;border-radius:18px;font-size:0.9rem;margin-bottom:6px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);opacity:0;transform:translateY(8px);
+  transition:opacity 0.25s,transform 0.25s;pointer-events:none;
+}
+#puppy-speech.show{opacity:1;transform:translateY(0)}
+#puppy-speech::after{
+  content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
+  width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;
+  border-top:6px solid var(--card-bg);
+}
+.heart-particle{
+  position:absolute;pointer-events:none;font-size:1.5rem;
+  animation:heartFloat 1.2s ease-out forwards;z-index:50;
+}
+@keyframes heartFloat{
+  0%{opacity:1;transform:translateY(0) scale(1)}
+  100%{opacity:0;transform:translateY(-60px) scale(0.5)}
+}
+
+/* Card */
+.card{
+  background:var(--card-bg);border-radius:var(--radius);margin:8px 14px 12px;
+  padding:16px;position:relative;box-shadow:0 1px 4px rgba(0,0,0,0.04);
+}
+.card h3{font-size:1rem;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+
+/* Fortune */
+.fortune-result-card{padding:14px;border-radius:var(--radius-sm);text-align:center}
+@keyframes fortuneAppear{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+
+/* Lottery Reward */
+.lottery-reward-card{
+  background:linear-gradient(135deg,#FFFCF6 0%,#FFF0F5 100%);border-radius:12px;
+  padding:14px;margin:8px 0;text-align:center;
+  border:2px dashed #F9C5C5;animation:rewardPop 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+@keyframes rewardPop{0%{opacity:0;transform:scale(0.85)}100%{opacity:1;transform:scale(1)}}
+.lottery-reward-content{font-size:1.1em;line-height:1.7;color:#5C3B2E;font-weight:500;}
+.lottery-reward-tier{font-size:0.9rem;font-weight:700;margin-bottom:6px;letter-spacing:1px;}
+.lottery-reward-name{font-size:1.05rem;font-weight:700;color:#5C3B2E;margin-bottom:4px;}
+.lottery-reward-desc{font-size:0.88rem;color:#8B7E74;line-height:1.5;}
+.lottery-claimed-badge{
+  display:inline-block;margin-top:8px;padding:8px 20px;
+  background:#e8e8e8;color:#888;border-radius:999px;font-size:0.9rem;font-weight:650;
+}
+.lottery-claim-btn{transition:all 0.2s ease;}
+.lottery-claim-btn:hover{transform:scale(1.04);box-shadow:0 6px 20px rgba(0,0,0,0.18)!important;}
+.lottery-claim-btn:active{transform:scale(0.95);}
+
+/* Enhanced Card Styles */
+.card{
+  box-shadow:0 2px 12px rgba(0,0,0,0.05),0 0 0 1px rgba(0,0,0,0.02);
+  transition:box-shadow 0.3s,transform 0.2s;
+}
+.card:hover{box-shadow:0 4px 20px rgba(0,0,0,0.08),0 0 0 1px rgba(0,0,0,0.03);}
+
+/* Puppy Decorations */
+.puppy-paw{
+  position:absolute;font-size:1.2rem;opacity:0.15;pointer-events:none;
+  animation:pawFloat 3s ease-in-out infinite;
+}
+@keyframes pawFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-8px) rotate(10deg)}}
+.puppy-bone{
+  display:inline-block;font-size:0.9rem;opacity:0.4;margin:0 2px;
+}
+.card h3 .puppy-icon{
+  display:inline-block;animation:puppyWiggle 2s ease-in-out infinite;
+}
+@keyframes puppyWiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+
+/* Enhanced Auth Screen */
+.auth-icon{font-size:6rem;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.1));}
+.auth-btn{
+  transition:transform 0.2s,box-shadow 0.2s,filter 0.2s;
+}
+.auth-btn:hover{filter:brightness(1.05);}
+
+/* Puppy Zone Enhancements */
+#puppy-zone{
+  background:radial-gradient(ellipse at center,rgba(240,180,180,0.08) 0%,transparent 70%);
+  border-radius:var(--radius);margin:0 8px;
+}
+#puppy-speech{
+  background:linear-gradient(135deg,#FFFCF8,#FFF5F0);
+  border:1px solid rgba(240,180,180,0.2);
+}
+
+/* Improved SOS button */
+#sos-button{
+  animation:sosPulseNew 2.5s ease infinite;
+}
+@keyframes sosPulseNew{
+  0%,100%{box-shadow:0 4px 16px rgba(200,40,40,0.4)}
+  50%{box-shadow:0 4px 32px rgba(200,40,40,0.7),0 0 0 14px rgba(200,40,40,0.08)}
+}
+
+/* Paw print background pattern */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  opacity:0.03;
+  background-image:
+    radial-gradient(circle at 15% 20%,#C08060 1px,transparent 1px),
+    radial-gradient(circle at 15% 20%,#C08060 2px,transparent 2px),
+    radial-gradient(circle at 12% 18%,#C08060 2px,transparent 2px),
+    radial-gradient(circle at 18% 18%,#C08060 2px,transparent 2px),
+    radial-gradient(circle at 75% 45%,#C08060 1px,transparent 1px),
+    radial-gradient(circle at 75% 45%,#C08060 2px,transparent 2px),
+    radial-gradient(circle at 72% 43%,#C08060 2px,transparent 2px),
+    radial-gradient(circle at 78% 43%,#C08060 2px,transparent 2px),
+    radial-gradient(circle at 50% 75%,#C08060 1px,transparent 1px),
+    radial-gradient(circle at 50% 75%,#C08060 2px,transparent 2px),
+    radial-gradient(circle at 47% 73%,#C08060 2px,transparent 2px),
+    radial-gradient(circle at 53% 73%,#C08060 2px,transparent 2px),
+    radial-gradient(circle at 30% 85%,#C08060 1px,transparent 1px),
+    radial-gradient(circle at 30% 85%,#C08060 2px,transparent 2px),
+    radial-gradient(circle at 27% 83%,#C08060 2px,transparent 2px),
+    radial-gradient(circle at 33% 83%,#C08060 2px,transparent 2px);
+  background-size:300px 300px,300px 300px,300px 300px,300px 300px,
+    300px 300px,300px 300px,300px 300px,300px 300px,
+    300px 300px,300px 300px,300px 300px,300px 300px,
+    300px 300px,300px 300px,300px 300px,300px 300px;
+  background-position:
+    10% 15%,10% 15%,10% 15%,10% 15%,
+    80% 50%,80% 50%,80% 50%,80% 50%,
+    45% 70%,45% 70%,45% 70%,45% 70%,
+    25% 88%,25% 88%,25% 88%,25% 88%;
+}
+
+/* Schedule */
+.course-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f5ece5}
+.course-item:last-child{border-bottom:none}
+.course-item.active{background:rgba(240,180,180,0.1);margin:0 -8px;padding:8px;border-radius:8px}
+.course-name{font-weight:650;font-size:0.92rem}
+.course-info{font-size:0.78rem;color:var(--text-sub)}
+.course-time{font-size:0.82rem;font-weight:600;color:var(--accent-strong)}
+.no-course{text-align:center;color:var(--text-sub);font-size:0.9rem;padding:8px 0}
+
+/* Period */
+.period-phase{font-size:0.9rem;margin-bottom:4px}
+.period-next{font-size:0.82rem;color:var(--text-sub)}
+.period-calendar{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:2px;
+  text-align:center;font-size:0.78rem;margin-top:10px;padding:6px;
+  background:rgba(0,0,0,0.02);border-radius:8px;
+}
+.cal-header{font-weight:650;padding:4px 0;color:var(--text-sub);font-size:0.72rem}
+.cal-day{padding:5px 2px;border-radius:4px}
+.cal-day.other-month{color:#ddd}
+.cal-day.today{background:rgba(240,180,180,0.2);font-weight:700}
+.cal-day.period-day{background:rgba(240,130,130,0.25);border-radius:50%;font-weight:700;color:#D04040}
+.cal-day.predicted-day{background:rgba(240,160,80,0.2);border-radius:50%;font-weight:700;color:#D08040}
+
+/* Exam */
+.exam-item{padding:10px 0;border-bottom:1px solid #f5ece5;cursor:pointer}
+.exam-item:last-child{border-bottom:none}
+.exam-subject{font-weight:650;font-size:0.92rem}
+.exam-countdown{font-size:0.8rem;font-weight:650;padding:3px 10px;border-radius:12px;display:inline-block}
+.exam-countdown.urgent{background:#FFE8E8;color:#D04040}
+.exam-countdown.mid{background:#FFF4E0;color:#D08040}
+.exam-countdown.safe{background:#E8F4E8;color:#5B9060}
+.exam-tasks{margin-top:8px;padding-left:8px;display:none}
+.exam-tasks.open{display:block}
+.exam-progress{height:4px;background:#f0e8e0;border-radius:2px;margin-top:6px;overflow:hidden}
+.exam-progress-bar{height:100%;background:var(--accent-strong);border-radius:2px;transition:width 0.3s}
+
+/* Diary */
+.diary-form textarea{
+  width:100%;padding:12px;border:1px solid #f0e5dc;border-radius:var(--radius-sm);
+  font-size:0.9rem;font-family:var(--font);resize:vertical;min-height:70px;
+  background:var(--card-bg);outline:none;
+}
+.diary-form textarea:focus{border-color:var(--accent-strong)}
+.diary-moods{display:flex;gap:8px;margin:8px 0}
+.diary-mood-btn{
+  padding:6px 14px;border:2px solid #f0e5dc;border-radius:999px;
+  background:var(--card-bg);cursor:pointer;font-size:1.1rem;transition:all 0.15s;
+}
+.diary-mood-btn.selected{border-color:var(--accent-strong);background:rgba(240,180,180,0.15);transform:scale(1.08)}
+.diary-actions{display:flex;gap:8px;justify-content:flex-end}
+.diary-actions button{
+  padding:8px 18px;border:none;border-radius:999px;font-size:0.85rem;
+  cursor:pointer;font-weight:600;
+}
+.diary-entry{
+  margin-top:8px;padding:10px;border-radius:var(--radius-sm);
+  border-left:3px solid #ddd;background:rgba(0,0,0,0.01);
+}
+.diary-entry.happy{border-left-color:#F0A8B0}
+.diary-entry.normal{border-left-color:#C0C0C0}
+.diary-entry.sad{border-left-color:#8BA4C7}
+.diary-content{font-size:0.88rem;line-height:1.5}
+.diary-meta{font-size:0.75rem;color:var(--text-sub);margin-top:4px;display:flex;justify-content:space-between}
+.diary-reply{font-size:0.8rem;color:var(--accent-strong);font-style:italic;margin-top:4px}
+
+/* Photo */
+.photo-grid{columns:2;column-gap:8px;margin-top:8px}
+.photo-item{break-inside:avoid;margin-bottom:8px;border-radius:var(--radius-sm);overflow:hidden;cursor:pointer;position:relative}
+.photo-item img{width:100%;display:block;border-radius:var(--radius-sm)}
+.photo-caption{font-size:0.75rem;padding:4px 8px;color:var(--text-sub);text-align:center}
+.lightbox{
+  position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9998;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+}
+.lightbox.hidden{display:none}
+.lightbox img{max-width:95%;max-height:70vh;border-radius:8px}
+.lightbox-close{position:absolute;top:16px;right:20px;color:#fff;font-size:2rem;cursor:pointer}
+
+/* SOS */
+#sos-button{
+  position:fixed;bottom:80px;right:16px;width:56px;height:56px;
+  border-radius:50%;background:linear-gradient(135deg,#E84040,#C02020);
+  border:none;color:#fff;font-size:1.4rem;cursor:pointer;
+  box-shadow:0 4px 16px rgba(200,40,40,0.4);z-index:200;
+  animation:sosPulse 2s ease infinite;display:none;
+}
+#sos-button.visible{display:flex;align-items:center;justify-content:center}
+@keyframes sosPulse{0%,100%{box-shadow:0 4px 16px rgba(200,40,40,0.4)}50%{box-shadow:0 4px 28px rgba(200,40,40,0.7),0 0 0 12px rgba(200,40,40,0.1)}}
+.sos-modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9997;
+  display:flex;align-items:center;justify-content:center;
+}
+.sos-modal{
+  background:var(--card-bg);border-radius:var(--radius);padding:24px;
+  text-align:center;max-width:300px;width:90%;
+}
+
+/* Toast */
+#notify-toast{
+  position:fixed;top:10px;left:50%;transform:translateX(-50%) translateY(-120px);
+  background:var(--text);color:#fff;padding:12px 24px;border-radius:999px;
+  font-size:0.85rem;z-index:9999;transition:transform 0.35s cubic-bezier(0.175,0.885,0.32,1.275);
+  max-width:90%;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,0.2);
+}
+#notify-toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Settings Modal */
+.settings-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:9996;
+  display:flex;align-items:flex-end;justify-content:center;
+}
+.settings-overlay.hidden{display:none}
+.settings-modal{
+  background:var(--bg);border-radius:24px 24px 0 0;width:100%;max-width:480px;
+  max-height:82dvh;overflow-y:auto;padding:20px 16px 32px;
+  animation:slideUp 0.3s ease-out;
+}
+@keyframes slideUp{0%{transform:translateY(100%)}100%{transform:translateY(0)}}
+.settings-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.settings-tab{
+  padding:6px 14px;border-radius:999px;border:1.5px solid #e8d8d0;
+  background:transparent;cursor:pointer;font-size:0.82rem;white-space:nowrap;
+  transition:all 0.15s;
+}
+.settings-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.settings-section h3{font-size:1rem;margin-bottom:10px}
+.settings-row{display:flex;gap:8px;margin-bottom:8px}
+.settings-row input,.settings-row select{
+  flex:1;padding:10px 12px;border:1px solid #e8d8d0;border-radius:8px;
+  font-size:0.88rem;background:var(--card-bg);outline:none;
+}
+.settings-row button{
+  padding:10px 16px;background:var(--accent);color:#fff;border:none;
+  border-radius:8px;font-weight:650;cursor:pointer;white-space:nowrap;
+}
+.symptom-list{display:flex;gap:6px;flex-wrap:wrap}
+.symptom-chip{
+  padding:5px 12px;border:1px solid #e8d8d0;border-radius:999px;font-size:0.78rem;
+  cursor:pointer;transition:all 0.15s;
+}
+.symptom-chip.selected{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* Public cards */
+.wishlist-item,.together-item{
+  display:flex;align-items:center;gap:10px;padding:8px 0;
+  border-bottom:1px solid #f5ece5;font-size:0.88rem;
+}
+.wishlist-item .check,.together-item .check{
+  width:22px;height:22px;border:2px solid #ddd;border-radius:50%;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:0.7rem;flex-shrink:0;transition:all 0.15s;
+}
+.wishlist-item .check.done,.together-item .check.done{background:var(--accent-strong);border-color:var(--accent-strong);color:#fff}
+.wishlist-item .text,.together-item .text{flex:1}
+.wishlist-item .text.done,.together-item .text.done{text-decoration:line-through;color:var(--text-sub)}
+
+.anniversary-countdown{text-align:center;font-size:1.2rem;font-weight:700;color:var(--heart)}
+.anniversary-label{text-align:center;font-size:0.85rem;color:var(--text-sub);margin-bottom:4px}
+
+/* Partner fortune */
+.partner-fortune{margin-top:10px;padding:10px;background:rgba(240,180,180,0.08);border-radius:var(--radius-sm)}
+.partner-fortune-label{font-size:0.78rem;color:var(--text-sub);margin-bottom:4px}
+
+/* Footer */
+footer{text-align:center;padding:20px 0 30px;font-size:0.78rem;color:var(--text-sub)}
+footer button{
+  padding:8px 20px;border:1.5px solid #e8d8d0;border-radius:999px;
+  background:var(--card-bg);font-size:0.85rem;cursor:pointer;color:var(--text);
+  transition:all 0.15s;
+}
+footer button:active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* Share toggle */
+.share-toggle{
+  display:inline-flex;align-items:center;gap:6px;font-size:0.75rem;color:var(--text-sub);
+  cursor:pointer;margin-left:auto;
+}
+.share-toggle .dot{width:8px;height:8px;border-radius:50%;background:#ccc;transition:background 0.2s}
+.share-toggle.on .dot{background:#6BC070}
+
+/* Sparkles */
+#sparkles{position:fixed;inset:0;pointer-events:none;z-index:0}
+.sparkle{position:absolute;opacity:0.5;animation:sparkleDrift 8s ease-in-out infinite}
+@keyframes sparkleDrift{0%{transform:translateY(0) scale(0.8)}50%{transform:translateY(-25px) scale(1.2)}100%{transform:translateY(0) scale(0.8)}}
+
+/* Misc */
+.hidden{display:none!important}
+.btn-primary{
+  background:var(--accent-strong);color:#fff;border:none;padding:10px 20px;
+  border-radius:999px;font-weight:650;cursor:pointer;font-size:0.9rem;
+}
+.btn-danger{background:none;border:none;color:#D06060;cursor:pointer;font-size:0.8rem}
+.delete-btn{background:none;border:none;color:var(--accent-strong);cursor:pointer;font-size:0.78rem}
+input[type="file"]{display:none}
+</style>
+</head>
+<body>
+
+<!-- Auth Screen -->
+<div id="auth-screen">
+  <div class="auth-icon">💑</div>
+  <div class="auth-title">🐶 情侣空间 · 小窝 🐶</div>
+  <div class="auth-sub">🐾 和你的另一半，共享每一天 🐾</div>
+  <button class="auth-btn boy" onclick="Auth.chooseRole('boyfriend')">💙 我是小宇</button>
+  <button class="auth-btn girl" onclick="Auth.chooseRole('girlfriend')">💗 我是小鱼</button>
+  <div class="auth-pair" id="auth-pair-create">
+    <div class="pair-code-display">
+      <div class="hint">你的配对码</div>
+      <div class="code" id="my-pair-code">------</div>
+      <div class="hint">发给你的另一半，让TA输入</div>
+    </div>
+  </div>
+  <div class="auth-pair" id="auth-pair-join">
+    <div class="hint" style="margin-bottom:8px">输入另一半的配对码</div>
+    <input type="text" id="pair-code-input" maxlength="6" placeholder="000000">
+    <button onclick="Auth.joinPair()">💕 连接</button>
+  </div>
+</div>
+
+<!-- Partner Bar -->
+<div id="partner-bar">
+  <span class="online-dot" id="partner-dot"></span>
+  <span class="partner-name" id="partner-name"></span>
+  <span class="partner-mood" id="partner-mood"></span>
+  <span style="font-size:0.75rem;color:var(--text-sub)" id="partner-status-text"></span>
+  <button onclick="App.setMyMood()" style="background:none;border:none;cursor:pointer;font-size:1rem" title="设置心情">✏️</button>
+</div>
+
+<!-- Sparkles -->
+<div id="sparkles"></div>
+
+<!-- Hero -->
+<div id="hero" class="card hero-day">
+  <div id="greeting-text">你好呀~</div>
+  <div id="weather-card">🌈 天气加载中...</div>
+</div>
+
+<!-- Puppy -->
+<div id="puppy-zone">
+  <div id="puppy-speech"></div>
+  <img id="puppy-img" src="" alt="线条小狗">
+</div>
+
+<!-- Public Dynamic (couple fortune) -->
+<section class="card" id="public-dynamic-card">
+  <h3><span class="puppy-icon">🐾</span> 每日灵签 <span class="puppy-bone">🦴</span></h3>
+  <div id="public-dynamic"></div>
+</section>
+
+<!-- Fortune -->
+<section class="card" id="fortune-card">
+  <h3><span class="puppy-icon">🐾</span> 摇签问卜 <span class="puppy-bone">🦴</span></h3>
+  <div id="fortune-display"></div>
+</section>
+
+<!-- Message -->
+<section class="card" id="message-card">
+  <div id="warm-message">今天也要开心哦~</div>
+  <div style="text-align:right;margin-top:6px">
+    <button id="refresh-message" style="background:none;border:none;color:var(--accent-strong);cursor:pointer;font-size:0.8rem">🔄 换一句</button>
+  </div>
+</section>
+
+<!-- Schedule -->
+<section class="card" id="schedule-card">
+  <h3><span class="puppy-icon">🐾</span> 今日课表 <span class="share-toggle" id="share-schedule" onclick="App.toggleShare('schedule')"><span class="dot"></span> 共享</span></h3>
+  <div id="today-schedule"></div>
+  <div id="next-class-countdown"></div>
+</section>
+
+<!-- Period -->
+<section class="card" id="period-card">
+  <h3><span class="puppy-icon">🐾</span> 生理期小助手 <span class="puppy-bone">🦴</span></h3>
+  <div id="period-status"></div>
+</section>
+
+<!-- Exam -->
+<section class="card" id="exam-card">
+  <h3><span class="puppy-icon">🐾</span> 考试倒计时 <span class="share-toggle" id="share-exam" onclick="App.toggleShare('exam')"><span class="dot"></span> 共享</span></h3>
+  <div id="exam-display"></div>
+</section>
+
+<!-- Diary -->
+<section class="card" id="diary-card">
+  <h3><span class="puppy-icon">🐾</span> 心情日记 <span class="puppy-bone">🦴</span></h3>
+  <div id="diary-display"></div>
+</section>
+
+<!-- Photo -->
+<section class="card" id="photo-card">
+  <h3><span class="puppy-icon">🐾</span> 照片墙 <span class="puppy-bone">🦴</span></h3>
+  <div id="photo-display"></div>
+</section>
+
+<!-- Wishlist -->
+<section class="card" id="wishlist-card">
+  <h3><span class="puppy-icon">🐾</span> 共同愿望清单 <span class="puppy-bone">🦴</span></h3>
+  <div id="wishlist-display"></div>
+</section>
+
+<!-- Together -->
+<section class="card" id="together-card">
+  <h3><span class="puppy-icon">🐾</span> 一起做的事 <span class="puppy-bone">🦴</span></h3>
+  <div id="together-display"></div>
+</section>
+
+<!-- Anniversary -->
+<section class="card" id="anniversary-card">
+  <h3><span class="puppy-icon">🐾</span> 纪念日 <span class="puppy-bone">🦴</span></h3>
+  <div id="anniversary-display"></div>
+</section>
+
+<!-- SOS Button -->
+<button id="sos-button" title="一键求助">🆘</button>
+
+<!-- Notify Toast -->
+<div id="notify-toast"></div>
+
+<!-- Photo Lightbox -->
+<div class="lightbox hidden" id="photo-lightbox">
+  <span class="lightbox-close" onclick="document.getElementById('photo-lightbox').classList.add('hidden')">✕</span>
+  <img id="lightbox-img" src="" alt="">
+  <div style="color:#fff;margin-top:12px;font-size:0.9rem" id="lightbox-caption"></div>
+</div>
+
+<!-- Settings Modal -->
+<div class="settings-overlay hidden" id="settings-overlay">
+  <div class="settings-modal" id="settings-modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <span style="font-weight:700;font-size:1.1rem">⚙ 设置</span>
+      <button id="close-settings" style="background:none;border:none;font-size:1.4rem;cursor:pointer">✕</button>
+    </div>
+    <div class="settings-tabs" id="settings-tabs"></div>
+    <div id="settings-form"></div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div style="margin-bottom:8px">🐶 · · 🐾 · 🦴 · 🐾 · 🦴 · 🐾 · · 🐶</div>
+  <button id="open-settings">⚙ 设置</button>
+</footer>
+<!-- REST API adapter (replaces Firebase) -->
+<script src="api.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   情侣空间 · 完整应用逻辑
+   ═══════════════════════════════════════════════════════════════ */
+/* ========== Globals ========== */
+let myRole, partnerUid;
+const ROLE_LABEL = { boyfriend:'小宇', girlfriend:'小鱼' };
+const ROLE_EMOJI = { boyfriend:'💙', girlfriend:'💗' };
+
+/* ========== Storage Fallback ========== */
+const LS = {
+  get(k, fb){ try{ const v=localStorage.getItem('couple_'+k); return v?JSON.parse(v):fb; }catch{return fb} },
+  set(k,v){ try{ localStorage.setItem('couple_'+k, JSON.stringify(v)); }catch(e){console.warn('LS set fail',e)} },
+  remove(k){ localStorage.removeItem('couple_'+k) }
+};
+
+/* ========== Auth ========== */
+const Auth = {
+  async init(){
+    // Use myUid from api.js (generated from localStorage, no auth needed)
+    myRole=LS.get('role',null);
+    if(!myRole){ this.showRoleSelect(); return; }
+    await Sync.initMyData();
+    partnerUid=LS.get('partnerUid',null);
+    if(!partnerUid){ this.showPairScreen(); return; }
+    await Sync.listenPartner();
+    LS.set('partnerUid',partnerUid);
+    this.showMainApp();
+  },
+
+  showRoleSelect(){
+    document.getElementById('auth-screen').classList.remove('hidden');
+    document.getElementById('auth-pair-create').classList.remove('active');
+    document.getElementById('auth-pair-join').classList.remove('active');
+  },
+
+  async chooseRole(role){
+    myRole=role;
+    LS.set('role',role);
+    await safeFBAsync(()=>firebase.database().ref('users/'+myUid+'/role').set(role));
+    this.showPairScreen();
+  },
+
+  async showPairScreen(){
+    document.getElementById('auth-screen').classList.remove('hidden');
+    document.getElementById('auth-pair-create').classList.add('active');
+    document.getElementById('auth-pair-join').classList.add('active');
+
+    // Show my pair code
+    const pairCode=LS.get('pairCode',null) || String(Math.floor(100000+Math.random()*900000));
+    LS.set('pairCode',pairCode);
+    document.getElementById('my-pair-code').textContent=pairCode;
+
+    // Write pair code to Firebase (offline-safe)
+    await safeFBAsync(async()=>{
+      const ref=firebase.database().ref('pairs/'+pairCode);
+      const existing=await (await ref.get()).val();
+      if(!existing){
+        const data={created:Date.now()};
+        data[myRole+'Uid']=myUid;
+        await ref.set(data);
+      }else if(!existing[myRole+'Uid'] || existing[myRole+'Uid']===myUid){
+        existing[myRole+'Uid']=myUid;
+        await ref.set(existing);
+      }
+    })
+  },
+
+  async joinPair(){
+    const code=document.getElementById('pair-code-input').value.trim();
+    if(code.length!==6){ alert('请输入6位配对码'); return; }
+    const otherRole=myRole==='boyfriend'?'girlfriend':'boyfriend';
+    LS.set('pairCode',code);
+    try{
+      // Check if pair exists on server
+      const snap=await firebase.database().ref('pairs/'+code).get();
+      const data=snap.val();
+      if(!data){ alert('配对码无效，请检查后重试'); return; }
+      const otherUid=data[otherRole+'Uid'];
+      if(!otherUid){ alert('另一半还没连接，请等TA先打开应用'); return; }
+      // Both sides registered — link them
+      partnerUid=otherUid;
+      LS.set('partnerUid',partnerUid);
+      await firebase.database().ref('users/'+myUid+'/partnerUid').set(partnerUid);
+      await firebase.database().ref('users/'+partnerUid+'/partnerUid').set(myUid);
+      // Add my uid to the pair
+      data[myRole+'Uid']=myUid;
+      await firebase.database().ref('pairs/'+code).set(data);
+    }catch(e){
+      // Backend unreachable — use localStorage only
+      console.warn('Backend unreachable, offline mode:',e.message);
+      partnerUid='partner_'+code;
+      LS.set('partnerUid',partnerUid);
+    }
+    if(!partnerUid) return;
+    await Sync.listenPartner();
+    this.showMainApp();
+  },
+
+  showMainApp(){
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('partner-bar').classList.add('active');
+    App.init();
+  }
+};
+
+/* ========== Sync Layer ========== */
+const Sync = {
+  async initMyData(){
+    // Ensure role exists in Firebase
+    const roleSnap=await firebase.database().ref('users/'+myUid+'/role').get();
+    if(!roleSnap.val()) await firebase.database().ref('users/'+myUid+'/role').set(myRole);
+    // Read partnerUid from Firebase
+    const pSnap=await firebase.database().ref('users/'+myUid+'/partnerUid').get();
+    if(pSnap.val()){ partnerUid=pSnap.val(); LS.set('partnerUid',partnerUid); }
+  },
+
+  async listenPartner(){
+    if(!partnerUid) return;
+    // Listen partner status
+    firebase.database().ref('users/'+partnerUid+'/status').on('value',snap=>{
+      const s=snap.val();
+      if(s){
+        const dot=document.getElementById('partner-dot');
+        if(s.online) dot.classList.add('live'); else dot.classList.remove('live');
+        document.getElementById('partner-status-text').textContent=s.online?'在线':(s.lastSeen?this._timeAgo(s.lastSeen):'离线');
+      }
+    });
+    // Listen partner mood
+    firebase.database().ref('users/'+partnerUid+'/mood').on('value',snap=>{
+      const m=snap.val();
+      if(m) document.getElementById('partner-mood').textContent=m;
+    });
+    // Listen partner name
+    firebase.database().ref('users/'+partnerUid+'/role').on('value',snap=>{
+      const r=snap.val();
+      if(r) document.getElementById('partner-name').textContent=(ROLE_EMOJI[r]||'')+' '+ROLE_LABEL[r];
+    });
+    // Listen partner data changes for real-time refresh
+    firebase.database().ref('users/'+partnerUid).on('value',snap=>{
+      if(snap.val()) App.refreshPartnerData();
+    });
+    // Listen public changes
+    firebase.database().ref('public').on('value',snap=>{
+      App.refreshPublicData();
+    });
+  },
+
+  _timeAgo(ts){
+    const s=Math.floor((Date.now()-ts)/1000);
+    if(s<60) return '刚刚';
+    if(s<3600) return Math.floor(s/60)+'分钟前';
+    if(s<86400) return Math.floor(s/3600)+'小时前';
+    return Math.floor(s/86400)+'天前';
+  },
+
+  // Write my data
+  async setMyData(path,value){
+    LS.set('my_'+path.replace('/','_'),value);
+    try{ await firebase.database().ref('users/'+myUid+'/'+path).set(value); }
+    catch(e){ console.warn('FB write fail:',e); }
+  },
+
+  // Write public data
+  async pushPublic(path,value){
+    try{ return await firebase.database().ref('public/'+path).push(value); }
+    catch(e){ console.warn('FB public write fail:',e); return null; }
+  },
+  async setPublic(path,value){
+    try{ await firebase.database().ref('public/'+path).set(value); }
+    catch(e){ console.warn('FB public set fail:',e); }
+  },
+
+  // Read my data from Firebase + merge to localStorage
+  async loadMyData(path,fallback){
+    try{
+      const snap=await firebase.database().ref('users/'+myUid+'/'+path).get();
+      const fbVal=snap.val();
+      if(fbVal!==null && fbVal!==undefined){ LS.set('my_'+path.replace('/','_'),fbVal); return fbVal; }
+    }catch(e){ console.warn('FB read fail for '+path,e); }
+    // Fallback to localStorage
+    const lsVal=LS.get('my_'+path.replace('/','_'),null);
+    if(lsVal!==null) return lsVal;
+    return typeof fallback==='function'?fallback():fallback;
+  },
+
+  // Get partner data
+  async loadPartnerData(path,fallback){
+    if(!partnerUid) return fallback;
+    try{
+      const snap=await firebase.database().ref('users/'+partnerUid+'/'+path).get();
+      const val=snap.val();
+      return val!==null&&val!==undefined?val:fallback;
+    }catch(e){ return fallback; }
+  },
+
+  // Update online status (REST polling)
+  async updateOnline(){
+    if(!myUid) return;
+    Sync.setMyData('status', {online:true, lastSeen:Date.now()});
+    setInterval(() => {
+      Sync.setMyData('status', {online:true, lastSeen:Date.now()});
+    }, 30000);
+    // Mark offline on page unload
+    window.addEventListener('beforeunload', () => {
+      navigator.sendBeacon(API_BASE + '/api/users/' + myUid + '/status', JSON.stringify({online:false, lastSeen:Date.now()}));
+    });
+  }
+};
+
+/* ========== Weather ========== */
+const Weather={
+  API_HOST:'https://nu5rk7gkwm.re.qweatherapi.com',
+  API_KEY:'4604d93926f34361838e63bc41aff03e',
+  LOCATION_ID:'101220307',
+  cache:null,cacheTime:0,
+
+  async fetch(){
+    const now=Date.now();
+    if(this.cache&&(now-this.cacheTime)<30*60*1000) return this.cache;
+    try{
+      const resp=await fetch(`${this.API_HOST}/v7/weather/now?location=${this.LOCATION_ID}&key=${this.API_KEY}`);
+      const data=await resp.json();
+      if(data.code!=='200') throw new Error(data.code);
+      this.cache={temp:data.now.temp,feelsLike:data.now.feelsLike,text:data.now.text,windDir:data.now.windDir,windScale:data.now.windScale,humidity:data.now.humidity,icon:data.now.icon,updated:new Date()};
+      this.cacheTime=now;
+      return this.cache;
+    }catch(e){ console.warn('Weather fail:',e); return this.cache||null; }
+  },
+
+  getIcon(code){
+    const m={'100':'☀️','101':'🌤','102':'⛅','103':'☁️','104':'☁️','300':'🌦','301':'🌦','302':'🌧','303':'⛈','304':'⛈','305':'🌧','306':'🌧','307':'🌧','308':'🌧','309':'🌧','310':'🌧','311':'🌧','312':'🌧','313':'🌧','314':'🌧','315':'🌧','316':'🌧','317':'🌧','400':'🌨','401':'🌨','402':'🌨','403':'🌨','404':'🌧','405':'🌧','406':'🌧','407':'🌧','500':'🌫','501':'🌫','502':'🌫','503':'🌪','504':'🌪','507':'🌪','508':'🌪'};
+    return m[code]||'🌈';
+  },
+
+  getTip(w){
+    if(!w) return '';
+    const tips=[];
+    const code=parseInt(w.icon),temp=parseInt(w.temp);
+    if(code>=300&&code<400) tips.push('今天有雨哦，记得带伞~');
+    if(code>=400&&code<500) tips.push('外面下雨啦，出门小心路滑~');
+    if(temp<10) tips.push('好冷呀，多穿点别感冒了！');
+    if(temp<5) tips.push('好冷好冷，围巾手套都带上！');
+    if(temp>30) tips.push('太阳好大，记得涂防晒霜~');
+    if(temp>35) tips.push('超级热！多喝水，小心中暑~');
+    if(parseInt(w.windScale)>=5) tips.push('风好大，穿裙子要小心哦~');
+    if(parseInt(w.humidity)>85) tips.push('湿度有点高，头发会炸毛哦~');
+    if(tips.length===0){ if(code===100) tips.push('天气晴好，心情也要棒棒的~'); else if(code<=103) tips.push('还不错的天气呢~'); else tips.push('无论什么天气，你都是最可爱的~'); }
+    return tips[Math.floor(Math.random()*tips.length)];
+  }
+};
+
+/* ========== Greeting ========== */
+const Greeting={
+  getPeriod(){ const h=new Date().getHours(); if(h>=6&&h<9) return'morning'; if(h>=9&&h<17) return'day'; if(h>=17&&h<21) return'evening'; return'night'; },
+  isLate(){ const h=new Date().getHours(); return h>=23||h<6; },
+  getGreeting(){
+    const pools={morning:['早安呀，今天也要元气满满！🐾','太阳晒屁股啦，快起床~','新的一天，新的小确幸✨','早上好！你今天的笑容已上线~'],day:['下午也加油，累了就摸摸小狗~','喝口水吧，你超棒的！','午后的阳光和你一样温柔☀️','学累了就休息一下~'],evening:['辛苦啦！今天你真了不起🌙','晚饭吃饱了吗？别饿着自己~','晚霞很温柔，你也是呀','一天又过去了，离梦想更近了一步~'],night:['晚安，做个草莓味的梦🍓','该睡啦！不许偷偷熬夜！','星星和月亮都陪你入眠✨','明天又是闪闪发光的一天~']};
+    const msgs=pools[this.getPeriod()]||pools.day;
+    return msgs[Math.floor(Math.random()*msgs.length)];
+  },
+  getHeroClass(){ const p=this.getPeriod(); const m={morning:'hero-morning',day:'hero-day',evening:'hero-evening',night:this.isLate()?'hero-late':'hero-night'}; return m[p]; },
+  update(el,heroEl){ el.textContent=this.getGreeting(); heroEl.className='card '+this.getHeroClass(); }
+};
+
+/* ========== Fortune (28 Daoist sticks) ========== */
+const Fortune={
+  _levelWeights:{'上上签':2,'上吉签':6,'中签':12,'下签':8},
+  sticks:[{id:1,level:'上上签',poem:'龙腾云海日光华，万里鹏程路不赊。\n自有贵人相引助，春风得意马蹄花。',allusion:'「鲤鱼跃龙门」—— 大禹治水时，江海之鱼逆流而上，跃过龙门者化身为龙。',oracle:{overall:'大吉大利之兆！如龙腾云海，势不可挡。',career:'学业事业如日中天，贵人相助，关键机遇将至。',love:'桃花旺盛，良缘可期。已有伴侣者感情升温。',health:'身心俱佳，精力充沛。宜趁此时调理养生。'}},{id:2,level:'上上签',poem:'月满西楼桂子香，金风玉露润华堂。\n心中所求皆如意，福寿康宁百事昌。',allusion:'「嫦娥奔月」—— 后羿之妻嫦娥服不死之药，飞升月宫，终得长生圆满。',oracle:{overall:'圆满如意之兆！如中秋满月，光明澄澈。',career:'学业事业将迎来丰收期。之前的努力开始结果。',love:'缘分已熟，如金风玉露相逢。感情甜蜜稳定。',health:'身体康健，心态平和。保持现有良好习惯即可。'}},{id:3,level:'上吉签',poem:'春风吹绿上林枝，燕子衔泥归未迟。\n莫道今年花事晚，满园桃李正当时。',allusion:'「苏秦刺股」—— 战国苏秦游说列国，屡遭挫折，归家刺股苦读，终佩六国相印。',oracle:{overall:'渐入佳境之兆！时机刚好，步步向好。',career:'学业事业渐有起色。保持恒心，如燕子筑巢。',love:'感情需耐心经营。良缘已在路上。',health:'身体尚可，但需注意劳逸结合。'}},{id:4,level:'上吉签',poem:'梅开雪后暗香浮，铁骨冰心自不孤。\n待到东风回暖日，千红万紫绘新图。',allusion:'「韩信胯下之辱」—— 韩信少年时受胯下之辱，忍辱负重，终成汉初三杰之一。',oracle:{overall:'苦尽甘来之兆！眼前的困难只是暂时的。',career:'学业事业暂有阻碍，但根基扎实。坚守本心。',love:'需经考验方见真心。暂时的冷淡不代表缘尽。',health:'注意防寒保暖。小病小恙无需过度担忧。'}},{id:5,level:'上吉签',poem:'清风明月两相宜，山水之间有鶴栖。\n淡泊明志心常泰，是非不到白云西。',allusion:'「陶渊明归隐」—— 陶渊明不为五斗米折腰，归隐田园，采菊东篱下。',oracle:{overall:'清净平和之兆！心静则万事顺。',career:'按部就班即是上策。不宜冒进。',love:'平淡中见真情。细水长流的感情最长久。',health:'心态平和是最好良药。适合练习静坐。'}},{id:6,level:'上吉签',poem:'金鳞本是池中物，一遇风云便化龙。\n莫笑今朝栖浅水，他年直上九霄重。',allusion:'「刘备三顾茅庐」—— 诸葛亮隐居隆中，得刘备三顾相请，出山后成就三分天下大业。',oracle:{overall:'蓄势待发之兆！你本有才，只待时机。',career:'才华即将得到认可。关键机会不要错过。',love:'真正懂你的人即将出现。不要将就。',health:'体质不错，但需适当锻炼。'}},{id:7,level:'上吉签',poem:'雨后青山分外明，尘埃洗尽见真情。\n莫因小事生烦恼，心底无私天地清。',allusion:'「六祖惠能」—— 禅宗六祖惠能大师言：本来无一物，何处惹尘埃。',oracle:{overall:'拨云见日之兆！困扰你的烦恼即将消散。',career:'之前的疑惑将得到解答。考试顺利。',love:'坦诚沟通可化解矛盾。真诚最能打动人。',health:'心态放松后身体自然好转。'}},{id:8,level:'上吉签',poem:'松柏青青耐岁寒，风霜不改旧时颜。\n守得云开星月现，初心不负即平安。',allusion:'「苏武牧羊」—— 苏武出使匈奴被扣，牧羊北海十九年，持节不屈。',oracle:{overall:'守正待时之兆！坚持做对的事。',career:'学习工作需持之以恒。专注本业。',love:'忠诚与信任是感情的基石。初心在则情不散。',health:'身体底子不错，保持规律作息就好。'}},{id:9,level:'中签',poem:'花开两朵各东西，一树春风有两歧。\n欲问前程何处好，心平气和自能知。',allusion:'「歧路亡羊」—— 杨朱之邻人追羊，因岔路太多而迷失方向。',oracle:{overall:'面临选择之兆！两条路各有优劣，静下心来答案自明。',career:'学业可能面临分叉路口。最终遵循本心。',love:'可能有多个选择，不要冲动。',health:'身体无大碍。选自己更能坚持的养生方案。'}},{id:10,level:'中签',poem:'船到桥头水自直，何须苦苦用心机。\n随缘任运逍遥过，春去秋来总有时。',allusion:'「庄子逍遥游」—— 庄周梦蝶，物我两忘。顺应自然，不强求。',oracle:{overall:'顺其自然之兆！有些事情强求不得。',career:'不必给自己太大压力。尽力而为即可。',love:'缘分强求不来。给彼此空间。',health:'良好作息比补药重要。保持平常心。'}},{id:11,level:'中签',poem:'云横秦岭家何在，雪拥蓝关马不前。\n且待天晴冰雪化，青山依旧笑开颜。',allusion:'「韩愈贬潮州」—— 韩愈谏迎佛骨被贬潮州，终得昭雪还朝。',oracle:{overall:'暂受阻隔之兆！不是终点，只是中场休息。',career:'学业事业暂时停滞。利用这段时间充电。',love:'感情进入平淡期。距离产生美。',health:'近期容易疲劳，需要好好休息。'}},{id:12,level:'中签',poem:'一盏寒灯照夜窗，十年辛苦读文章。\n功名不是朝夕事，水到渠成自放光。',allusion:'「范进中举」—— 范进屡试不第，坚持不辍，终在年老时中举。',oracle:{overall:'厚积薄发之兆！成功需要时间积累。',career:'学习需持之以恒。看似进展缓慢，实则根基渐固。',love:'好的缘分值得等待。提升自己是最好的准备。',health:'注意用眼和颈椎。长时间伏案要适当活动。'}},{id:13,level:'中签',poem:'蜻蜓点水过莲塘，浅浅深深各自忙。\n莫学蜻蜓轻点过，深耕一片自然香。',allusion:'「庖丁解牛」—— 庖丁专注解牛十九年，刀法入神。专注一事，必臻化境。',oracle:{overall:'戒浮戒躁之兆！做事不可蜻蜓点水。',career:'学业上需专注重点，不宜贪多。',love:'感情需用心经营，不可三心二意。',health:'专注一两项运动或养生方式即可。'}},{id:14,level:'中签',poem:'山高路远日悠悠，一步一印莫回头。\n行到水穷云起处，方知天地为君留。',allusion:'「玄奘西行」—— 唐僧玄奘孤身西行五万里，历经八十一难。',oracle:{overall:'脚踏实地之兆！目标虽远，一步一步走总能到达。',career:'学习是一场马拉松。稳扎稳打的人最终胜出。',love:'长期关系靠经营而非激情。珍惜身边人。',health:'坚持运动比偶尔剧烈锻炼更有益。'}},{id:15,level:'中签',poem:'花开不择富家院，月照何分贵贱人。\n但存方寸菩提心，处处春风处处新。',allusion:'「观音普度」—— 观世音菩萨大慈大悲，不分贵贱，普度众生。',oracle:{overall:'心存善念之兆！好运眷顾善良的人。',career:'乐于助人会有意外回报。互相帮助带来好机会。',love:'善良和温柔是最有吸引力的品质。',health:'心怀善念者往往更健康。'}},{id:16,level:'中签',poem:'棋逢对手局初开，胜负输赢未可猜。\n但尽己能无憾事，输赢都是好安排。',allusion:'「谢安围棋」—— 淝水之战时谢安与客下棋，闻捷报而不动声色。',oracle:{overall:'竞争之兆！全力以赴即无愧。',career:'考试或评比中放平心态。对手也是磨刀石。',love:'感情不是比赛，不要计较谁付出更多。',health:'身心状态平衡就好。不必和他人比较。'}},{id:17,level:'中签',poem:'落叶满阶红不扫，秋深犹有菊花香。\n繁华落尽见真淳，简简单单福更长。',allusion:'「刘禹锡陋室铭」—— 山不在高，有仙则名。斯是陋室，惟吾德馨。',oracle:{overall:'返璞归真之兆！简单生活有简单的快乐。',career:'学好基础比追求技巧更重要。',love:'最简单的浪漫最动人。一杯热水、一句问候。',health:'简单的生活方式最养生。'}},{id:20,level:'中签',poem:'种豆得豆理当然，种瓜岂望得芝兰。\n劝君多种菩提子，善果盈盈满玉盘。',allusion:'「了凡四训」—— 袁了凡通过积德行善改变命运，得子延寿。',oracle:{overall:'因果不爽之兆！种什么因得什么果。',career:'学习成绩反映付出的努力。没有捷径。',love:'你怎么对待感情，感情就怎么回报你。',health:'现在开始养生也不晚。'}},{id:21,level:'下签',poem:'浮云蔽日暗重楼，欲渡黄河冰塞舟。\n暂敛锋芒藏锐气，静待东风化解愁。',allusion:'「孔子困陈蔡」—— 孔子周游列国，困于陈蔡之间，绝粮七日。',oracle:{overall:'暂遇阻滞之兆！宜静不宜动，保存实力。',career:'学业事业可能遇到瓶颈。不要气馁。',love:'感情可能有波折。给彼此冷静的空间。',health:'注意身体健康，不要忽视小症状。'}},{id:22,level:'下签',poem:'逆水行舟用力撑，一篙松劲退千寻。\n此时若要停舟歇，恐被江流逐浪沉。',allusion:'「逆水行舟不进则退」—— 学如逆水行舟，不进则退。',oracle:{overall:'不可松懈之兆！现在是关键时期。',career:'学业关键时刻不能掉链子。考试前尤其如此。',love:'感情需要加倍的耐心维护。及时沟通化解。',health:'身体发出疲劳信号时不要硬撑。'}},{id:23,level:'下签',poem:'独坐幽篁弹旧琴，知音稀少恨难禁。\n高山流水终有遇，只是来时未可寻。',allusion:'「伯牙绝弦」—— 伯牙善琴，钟子期死，伯牙以为世无足鼓琴者。',oracle:{overall:'孤独之兆！但宁缺毋滥，这只是暂时的。',career:'学习中可能感到孤立。主动寻求帮助。',love:'可能有孤独感。不要因为寂寞而随意开始。',health:'多与朋友家人交流，倾诉是很好解压方式。'}},{id:24,level:'下签',poem:'秋雨梧桐叶落时，西风吹老旧年枝。\n来年春暖花重发，莫为今朝徒自悲。',allusion:'「黛玉葬花」—— 林黛玉见花落泪，葬花自怜。花开花落本自然。',oracle:{overall:'情绪低落之兆！一切都会过去。',career:'可能遇到小挫折或批评。这只是成长的一部分。',love:'旧情难忘或感情受挫。给自己时间疗伤。',health:'多晒太阳多运动，抑郁会随着汗水排解。'}},{id:25,level:'下签',poem:'树大招风自古然，出头椽木朽当先。\n藏锋敛锐深涵养，不露圭角自泰然。',allusion:'「杨修之死」—— 杨修恃才傲物，被曹操所杀。聪明反被聪明误。',oracle:{overall:'低调为上之兆！韬光养晦，低调行事。',career:'踏实做事比炫耀聪明更能赢得尊重。',love:'感情中低调一些更长久。两个人的甜蜜自己知道就好。',health:'身体没什么大问题。保持低调的养生习惯。'}},{id:26,level:'下签',poem:'大旱望云云不起，枯苗待雨雨来迟。\n天时有待君须耐，莫怨苍天莫怨时。',allusion:'「商汤祈雨」—— 商汤时天下大旱七年，汤以身祷于桑林。',oracle:{overall:'等待忍耐之兆！抱怨无用。耐心等待是最好的策略。',career:'考试成绩或机会可能来得比预期慢。在等待中持续努力。',love:'缘分可能姗姗来迟。最好的总在不经意间到来。',health:'慢性问题需要耐心调理。慢慢来比较快。'}},{id:27,level:'下签',poem:'前路茫茫雾锁江，风波处处险难防。\n小心驶得万年船，步步为营莫逞强。',allusion:'「赤壁之战」—— 曹操百万大军南下，因不习水战而败于赤壁。',oracle:{overall:'谨慎行事之兆！处处需小心，不可大意。',career:'考试前要仔细复习，不能有任何侥幸心理。',love:'言行需谨慎，无心之言可能伤人。',health:'外出注意交通安全。饮食卫生需留心。'}},{id:28,level:'下签',poem:'镜花水月本来空，执念太深反受穷。\n放下心头千斤担，轻舟已过万山重。',allusion:'「金刚经」—— 一切有为法，如梦幻泡影，如露亦如电。',oracle:{overall:'放下执着之兆！有些事放手反而更好。',career:'对成绩或结果的过度执着反而影响发挥。',love:'执念太深伤人伤己。学会放手。',health:'心理压力是健康大敌。学会释怀和放下。'}}],
+  _daoLevelKeys:null,_daoCumul:null,_daoTotalWeight:null,
+
+  _ensureCumul(){
+    if(this._daoCumul) return;
+    this._daoLevelKeys=Object.keys(this._levelWeights);
+    this._daoTotalWeight=this._daoLevelKeys.reduce((s,k)=>s+this._levelWeights[k],0);
+    let acc=0;
+    this._daoCumul=this._daoLevelKeys.map(k=>{acc+=this._levelWeights[k]/this._daoTotalWeight;return acc});
+    this._daoCumul[this._daoCumul.length-1]=1;
+  },
+
+  drawStick(){
+    this._ensureCumul();
+    const r=Math.random();
+    let level=this._daoLevelKeys[this._daoLevelKeys.length-1];
+    for(let i=0;i<this._daoCumul.length;i++){if(r<this._daoCumul[i]){level=this._daoLevelKeys[i];break}}
+    const pool=this.sticks.filter(s=>s.level===level);
+    return pool[Math.floor(Math.random()*pool.length)];
+  },
+
+  isAuspicious(stick){ return stick&&(stick.level==='上上签'||stick.level==='上吉签'); },
+
+  _levelColor(l){ const m={'上上签':'#C9302C','上吉签':'#D4793A','中签':'#6B8E6B','下签':'#5B7B9A'}; return m[l]||'#6B8E6B'; },
+  _levelBg(l){ const m={'上上签':'#FFF0ED','上吉签':'#FFF6EE','中签':'#F2F7F0','下签':'#EEF2F6'}; return m[l]||'#F2F7F0'; },
+  // ── 奖励库 (6 tiers) ──
+  lotteryTiers:[
+    {id:'warm_praise',name:'暖心夸夸',prob:0.30,color:'#F9A8D4',icon:'💌',items:[
+      '你的微笑能融化冰雪，是世界第八大奇迹 ✨',
+      '你认真的样子真的太帅了，比阳光还耀眼 ☀️',
+      '今天你做的每一件事都散发着温柔光芒 🕯️',
+      '你是这个世界上最可爱的存在，不接受反驳！',
+      '有你在的日子里，连空气都是甜的 🍯',
+      '世界上最好的运气就是遇见了你呀~',
+      '你的存在就是给这个世界最好的礼物 🎁',
+      '你笑起来的时候，整个世界都亮了 🌟',
+      '今天也是被你迷倒的一天呢~',
+      '你就是宇宙送给我最棒的惊喜 💫'
+    ]},
+    {id:'func_card',name:'功能卡',prob:0.25,color:'#FBBF24',icon:'🎫',items:[
+      {name:'按摩券 ×1',desc:'享受5分钟专业级肩颈按摩~'},
+      {name:'美食券 ×1',desc:'对方为你做一顿你最爱的菜！'},
+      {name:'免生气券 ×1',desc:'下次惹你生气时出示此券立刻原谅~'},
+      {name:'陪看剧券 ×1',desc:'选一部喜欢的剧/电影，对方陪看！'},
+      {name:'跑腿券 ×1',desc:'对方帮你跑腿取快递/买东西一次~'},
+      {name:'讲故事券 ×1',desc:'对方给你讲一个甜甜的睡前故事~'},
+      {name:'专属歌单 ×1',desc:'对方为你精心挑选10首歌组成专属歌单~'},
+      {name:'手写信 ×1',desc:'对方手写一封情书给你（至少300字）~'},
+      {name:'早安吻券 ×1',desc:'每天早上醒来第一个吻~'},
+      {name:'哄睡券 ×1',desc:'晚上睡不着时对方语音哄你入睡~'}
+    ]},
+    {id:'small_luck',name:'小幸运',prob:0.18,color:'#34D399',icon:'🍀',items:[
+      {name:'奶茶一杯',desc:'今天喝奶茶不用有罪恶感~'},
+      {name:'零食自由',desc:'去超市挑三样最想吃的零食！'},
+      {name:'电影票一张',desc:'下次约会选一部你最喜欢的电影~'},
+      {name:'睡到自然醒',desc:'周末可以睡到自然醒，不催你~'},
+      {name:'冰淇淋日',desc:'今天可以吃任何口味的冰淇淋~'},
+      {name:'懒人沙发权',desc:'今晚沙发归你，躺着看什么都行~'}
+    ]},
+    {id:'good_luck',name:'好运降临',prob:0.10,color:'#818CF8',icon:'🌈',items:[
+      {name:'甜点自由日',desc:'今天之内想吃任何甜点都可以~'},
+      {name:'约会策划权',desc:'下次约会行程你说了算，全听你的！'},
+      {name:'免打扰半天',desc:'享受半天完全属于自己的安静时光~'},
+      {name:'游戏自由时',desc:'今晚可以尽情打游戏，不被打扰~'},
+      {name:'手工DIY',desc:'一起做一件手工纪念品~'},
+      {name:'星空夜话',desc:'找个地方一起看星星聊天~'}
+    ]},
+    {id:'super_luck',name:'超级幸运',prob:0.09,color:'#F472B6',icon:'💎',items:[
+      {name:'情侣写真',desc:'一起拍一组情侣写真（或自拍大片）~'},
+      {name:'惊喜小礼物',desc:'对方送你一件心心念念的小礼物~'},
+      {name:'计划旅行日',desc:'一起认真讨论并制定一次旅行计划~'},
+      {name:'浪漫晚餐',desc:'对方亲手准备一顿烛光晚餐~'},
+      {name:'双人SPA',desc:'一起泡脚+敷面膜+互相按摩~'},
+      {name:'爱情契约',desc:'共同写一份专属的情侣守则~'}
+    ]},
+    {id:'miracle',name:'奇迹降临',prob:0.08,color:'#C084FC',icon:'👑',items:[
+      {name:'一日国王/女王',desc:'今天你就是最高统治者！所有合理要求都得满足~'},
+      {name:'周末双日约会',desc:'完整的周末约会，行程全部由你决定~'},
+      {name:'心愿单礼物',desc:'从你的心愿单中挑一件作为礼物送出~'},
+      {name:'豪华SPA日',desc:'完整SPA套餐：按摩+热敷+泡脚+香薰~'},
+      {name:'梦想基金',desc:'对方为你的某个小梦想存一笔基金~'},
+      {name:'纪念日特权',desc:'下一个纪念日你拥有全部决定权~'}
+    ]},
+  ],
+  _claimedRewards:{},
+
+  _loadClaimed(){ this._claimedRewards=LS.get('claimed_rewards',{}); },
+  _saveClaimed(){ LS.set('claimed_rewards',this._claimedRewards); },
+  isClaimed(key){ this._loadClaimed(); return !!this._claimedRewards[key]; },
+
+  claimReward(lotteryKey){
+    this._loadClaimed();
+    this._claimedRewards[lotteryKey]=true;
+    this._saveClaimed();
+  },
+
+
+  buildHTML(stick,showBonus,onBonus){
+    const lc=this._levelColor(stick.level),lb=this._levelBg(stick.level);
+    let h=`<div class="fortune-result-card" style="background:linear-gradient(180deg,${lb} 0%,#FFFCF6 35%);border:2px solid ${lc}33"><div style="background:${lc};display:inline-block;color:#fff;padding:4px 14px;border-radius:12px;font-size:0.85rem;margin-bottom:10px">第${stick.id}签 · ${stick.level}</div><div style="font-size:1.05em;line-height:1.9;margin:10px 0;color:#4A3528;white-space:pre-line">${stick.poem}</div><div style="font-size:0.82rem;color:#8B7E74;margin:8px 0;padding:8px 12px;background:rgba(0,0,0,0.02);border-radius:8px"><span style="font-weight:650">📜 典故</span> ${stick.allusion}</div><div style="margin-top:10px;text-align:left">${['overall','career','love','health'].map(k=>{const icons={overall:'🔮',career:'📚',love:'💕',health:'🍃'},titles={overall:'整体运势',career:'学业事业',love:'感情人际',health:'健康身心'};return`<div style="display:flex;gap:8px;padding:5px 0;font-size:0.84rem;line-height:1.5"><span>${icons[k]}</span><div><span style="font-weight:650">${titles[k]}</span><br><span style="color:#666">${stick.oracle[k]}</span></div></div>`}).join('')}</div><div style="margin-top:12px;font-size:0.8rem;color:#999;text-align:center">🏮 心诚则灵 · 每日一签 · ${stick.level} 🏮</div></div>`;
+    if(showBonus) h+=`<div style="text-align:center;margin-top:12px"><button id="bonus-lottery-btn" style="background:linear-gradient(135deg,#F9A8D4,#F472B6);border:none;border-radius:999px;padding:12px 28px;font-size:1rem;color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(244,114,182,0.35)">🎁 吉签加持 · 额外抽奖</button><div style="margin-top:6px;font-size:0.78rem;color:#aaa">签运吉祥，额外获得一次抽奖机会！</div></div>`;
+    return h;
+  },
+
+  // Weighted lottery draw
+  drawLottery(){
+    const r=Math.random();
+    let acc=0;
+    for(const tier of this.lotteryTiers){
+      acc+=tier.prob;
+      if(r<acc){
+        return {tier,item:tier.items[Math.floor(Math.random()*tier.items.length)]};
+      }
+    }
+    const t=this.lotteryTiers[0];
+    return {tier:t,item:t.items[0]};
+  },
+
+  render(el,fortune,onDraw,onBonus){
+    const todayStr=new Date().toDateString();
+    if(fortune&&fortune.date===todayStr){
+      let h=this.buildHTML(fortune.stick,this.isAuspicious(fortune.stick)&&!fortune.lottery,onBonus);
+      if(fortune.lottery){
+        const t=fortune.lottery;
+        const tier=t.tier||this.lotteryTiers[t.tierIdx]||null;
+        const key='reward_'+fortune.date+'_'+t.tierId;
+        const claimed=this.isClaimed(key);
+        if(typeof t.item==='string'){
+          h+=`<div class="lottery-reward-card"><div class="lottery-reward-content">${t.item}</div></div>`;
+        }else{
+          h+=`<div class="lottery-reward-card">`;
+          if(tier) h+=`<div class="lottery-reward-tier" style="color:${tier.color}">${tier.icon} ${tier.name}</div>`;
+          h+=`<div class="lottery-reward-name">${t.item.name}</div><div class="lottery-reward-desc">${t.item.desc}</div>`;
+          if(claimed){
+            h+=`<div class="lottery-claimed-badge">✅ 已兑现</div>`;
+          }else{
+            h+=`<button class="lottery-claim-btn" data-reward-key="${key}" style="background:linear-gradient(135deg,${tier?tier.color:'#F9A8D4'},${tier?tier.color+'aa':'#F472B6'});color:#fff;border:none;border-radius:999px;padding:10px 28px;font-size:0.95rem;cursor:pointer;font-weight:650;margin-top:8px;box-shadow:0 3px 12px rgba(0,0,0,0.12);transition:all 0.2s">🎁 兑现奖励</button>`;
+          }
+          h+=`</div>`;
+        }
+      }
+      el.innerHTML=h;
+      const bb=document.getElementById('bonus-lottery-btn');
+      if(bb) bb.addEventListener('click',()=>{ onBonus&&onBonus(); });
+      // Bind claim buttons
+      el.querySelectorAll('.lottery-claim-btn').forEach(btn=>{
+        btn.addEventListener('click',function(){
+          const k=this.dataset.rewardKey;
+          Fortune.claimReward(k);
+          this.textContent='✅ 已兑现';
+          this.style.background='#ccc';
+          this.style.cursor='default';
+          this.style.pointerEvents='none';
+          setTimeout(()=>App.updateFortune(),600);
+        });
+      });
+	      return;
+	    }
+	    el.innerHTML=`<div style="text-align:center"><div style="font-size:3rem;margin-bottom:8px">🐶</div><button id="fortune-btn" style="background:linear-gradient(135deg,#C9302C,#A02020);border:none;border-radius:999px;padding:14px 40px;font-size:1.1em;color:#fff;cursor:pointer;box-shadow:0 4px 18px rgba(201,48,44,0.3);transition:transform 0.2s,box-shadow 0.2s">🐾 摇签问卜 🐾</button><div style="margin-top:10px;font-size:0.82rem;color:#aaa">每日一签 · 心诚则灵 · 吉签有额外奖励哦</div></div>`;
+	    const btn=document.getElementById('fortune-btn');
+	    if(btn) btn.addEventListener('click',()=>{btn.textContent='摇签中...🐾';btn.disabled=true;btn.style.opacity='0.7';setTimeout(()=>onDraw&&onDraw(),1000)});
+	    btn.addEventListener('mouseenter',()=>{btn.style.transform='scale(1.04)';btn.style.boxShadow='0 6px 22px rgba(201,48,44,0.4)';});
+	    btn.addEventListener('mouseleave',()=>{btn.style.transform='scale(1)';btn.style.boxShadow='0 4px 18px rgba(201,48,44,0.3)';});
+	  }
+	};
+
+/* ========== Schedule ========== */
+const DEFAULT_COURSES=[{day:1,name:'企业财务诊断模拟实训',period:'1-4节',time:'08:30-12:00',room:''},{day:1,name:'财务分析',period:'5-6节',time:'14:30-15:35',room:''},{day:2,name:'企业财务诊断模拟实训',period:'1-4节',time:'08:30-12:00',room:''},{day:2,name:'Office高级应用',period:'5-6节',time:'14:30-15:35',room:''},{day:2,name:'习近平新时代中国特色社会主义思想概论',period:'7-8节',time:'15:55-17:30',room:''},{day:3,name:'高级财务管理',period:'1-2节',time:'08:30-10:05',room:''},{day:3,name:'财务分析',period:'3-4节',time:'10:25-12:00',room:''},{day:4,name:'金融学',period:'5-6节',time:'14:30-15:35',room:''},{day:4,name:'证券投资学',period:'7-8节',time:'15:55-17:30',room:''},{day:4,name:'电影中的科技史',period:'9-10节',time:'19:00-20:40',room:''},{day:5,name:'高级财务管理',period:'1-2节',time:'08:30-10:05',room:''}];
+const PERIOD_TIME_MAP={'1-2节':'08:30-10:05','3-4节':'10:25-12:00','1-4节':'08:30-12:00','5-6节':'14:30-15:35','7-8节':'15:55-17:30','9-10节':'19:00-20:40'};
+
+const Schedule={
+  courses:[],DAY_NAMES:['周日','周一','周二','周三','周四','周五','周六'],
+
+  _parseTime(ts){ if(!ts) return null; const i=ts.indexOf('-'); if(i===-1) return null; const p=ts.slice(0,i).split(':'); if(p.length!==2) return null; const h=parseInt(p[0]),m=parseInt(p[1]); return isNaN(h)||isNaN(m)?null:h*60+m; },
+
+  async load(){ const d=await Sync.loadMyData('schedule',[]); this.courses=d.length>0?d:DEFAULT_COURSES.map((c,i)=>({...c,id:Date.now()+i})); },
+  async save(){ await Sync.setMyData('schedule',this.courses); },
+
+  _jsDay(d){ return d===0?7:d; },
+  getToday(){ const ud=this._jsDay(new Date().getDay()); return this.courses.filter(c=>c.day===ud).sort((a,b)=>{(this._parseTime(a.time)||Infinity)-(this._parseTime(b.time)||Infinity)}); },
+  getNextClass(){ const today=this.getToday(),nm=new Date().getHours()*60+new Date().getMinutes(); for(const c of today){ const sm=this._parseTime(c.time); if(sm!==null&&nm<sm) return c; } return null; },
+
+  render(el,ce){
+    const today=this.getToday();
+    if(today.length===0){ el.innerHTML='<div class="no-course">今天没有课哦，好好休息~ 🐾</div>'; if(ce) ce.innerHTML=''; return; }
+    const nc=this.getNextClass(),nm=new Date().getHours()*60+new Date().getMinutes();
+    el.innerHTML=today.map(c=>{const act=c===nc;return`<div class="course-item${act?' active':''}"><div><div class="course-name">${c.name}</div><div class="course-info">${c.room||''} · ${c.period}</div></div><div class="course-time">${c.time}</div></div>`}).join('');
+    if(ce){
+      if(nc){ const sm=this._parseTime(nc.time),r=sm-nm; if(r>0&&r<=60) ce.innerHTML=`<div style="text-align:center;color:var(--accent);font-size:0.85rem">⏰ 下一节「${nc.name}」还有 ${r} 分钟</div>`; else if(r>60){ const h=Math.floor(r/60),m=r%60; ce.innerHTML=`<div style="text-align:center;color:var(--text-sub);font-size:0.85rem">下一节「${nc.name}」${h}小时${m}分钟后</div>`; } else ce.innerHTML=`<div style="text-align:center;color:var(--accent);font-size:0.85rem">🔔 「${nc.name}」马上开始啦！</div>`; }
+      else ce.innerHTML='<div style="text-align:center;color:var(--text-sub);font-size:0.85rem">今天的课都上完啦，真棒~ 🎉</div>';
+    }
+  },
+
+  renderSettings(formEl){
+    formEl.innerHTML=`<div class="settings-section"><h3>📚 课程管理</h3><div class="settings-row"><input id="course-name" placeholder="课程名称" style="flex:2"><input id="course-room" placeholder="教室" style="flex:1"></div><div class="settings-row"><select id="course-day">${this.DAY_NAMES.map((n,i)=>`<option value="${i===0?7:i}">${n}</option>`).join('')}</select><select id="course-period">${Object.entries(PERIOD_TIME_MAP).map(([k,v])=>`<option value="${k}">${k} ${v}</option>`).join('')}</select><button id="add-course-btn">+ 添加</button></div><div id="course-list" style="margin-top:10px"></div></div>`;
+    this._renderList(document.getElementById('course-list'));
+    document.getElementById('add-course-btn').addEventListener('click',()=>{
+      const name=document.getElementById('course-name').value.trim();
+      if(!name) return;
+      const room=document.getElementById('course-room').value.trim();
+      const day=parseInt(document.getElementById('course-day').value);
+      const period=document.getElementById('course-period').value;
+      const time=PERIOD_TIME_MAP[period]||'';
+      this.courses.push({id:Date.now(),name,day,period,time,room});
+      this.save();
+      this._renderList(document.getElementById('course-list'));
+      document.getElementById('course-name').value='';
+      document.getElementById('course-room').value='';
+    });
+  },
+
+  _renderList(el){
+    el.innerHTML=this.courses.length===0?'<div style="color:var(--text-sub);font-size:0.85rem">还没有添加课程~</div>':this.courses.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:0.85rem;border-bottom:1px solid #f0ebe0"><span>${this.DAY_NAMES[c.day]} ${c.period} ${c.name} ${c.room}</span><button onclick="Schedule.removeCourse(${c.id})" class="delete-btn">删除</button></div>`).join('');
+  },
+
+  removeCourse(id){ this.courses=this.courses.filter(c=>c.id!==id); this.save(); this._renderList(document.getElementById('course-list')); }
+};
+
+/* ========== Period ========== */
+const Period={
+  records:[],avgCycle:28,avgDuration:5,
+  SYMPTOMS:['腹痛','腰痛','头痛','疲劳','情绪波动','乳房胀痛','其他'],
+  CARE_TIPS:{during:['🫖 泡杯红糖水~','🔥 暖宝宝贴小腹~','🛌 早点休息别熬夜~','🍫 适量吃黑巧克力~'],upcoming:['🎒 备好卫生用品~','💧 多喝热水~','😴 保证充足睡眠~'],normal:['🏃 适当运动~','🥗 均衡饮食~','☀️ 晒晒太阳~']},
+
+  async load(){ this.records=(await Sync.loadMyData('periods',[])).map(r=>this._migrate(r)); },
+  async save(){ await Sync.setMyData('periods',this.records); },
+
+  _migrate(r){ if(r.startDate) return r; return{startDate:r.date,endDate:'',symptoms:[]}; },
+
+  addRecord(startDate,endDate,symptoms){ this.records.push({startDate,endDate:endDate||'',symptoms:symptoms||[]}); this.records.sort((a,b)=>new Date(a.startDate)-new Date(b.startDate)); this.save(); },
+  removeRecord(i){ this.records.splice(i,1); this.save(); },
+
+  calcAvgCycle(){ const s=[...this.records].sort((a,b)=>new Date(a.startDate)-new Date(b.startDate)),l3=s.slice(-3); if(l3.length<2) return this.avgCycle; let sum=0,c=0; for(let i=1;i<l3.length;i++){ const d=(new Date(l3[i].startDate)-new Date(l3[i-1].startDate))/86400000; if(d>15&&d<45){sum+=d;c++} } return c>0?Math.round(sum/c):this.avgCycle; },
+  predictNext(){ if(this.records.length===0) return null; const last=new Date(this.records[this.records.length-1].startDate); last.setDate(last.getDate()+this.calcAvgCycle()); return last; },
+
+  getStatus(){
+    if(this.records.length===0) return{phase:'no_data',text:'还没有记录哦，在设置里添加吧~',icon:'📝'};
+    const today=new Date(); today.setHours(0,0,0,0);
+    for(const r of this.records){
+      const s=new Date(r.startDate); s.setHours(0,0,0,0);
+      const e=r.endDate?new Date(r.endDate):new Date(s); if(!r.endDate) e.setDate(e.getDate()+this.avgDuration); e.setHours(0,0,0,0);
+      if(today>=s&&today<=e){ const dn=Math.floor((today-s)/86400000)+1; return{phase:'during',text:`生理期第 ${dn} 天，注意保暖~`,icon:'🌸'}; }
+    }
+    const next=this.predictNext(); if(next){ const diff=Math.ceil((next-today)/86400000); if(diff<=3&&diff>=0) return{phase:'upcoming',text:`预计 ${diff===0?'今天':diff+'天后'} 要来啦~`,icon:'🌱'}; if(diff<0&&diff>-7) return{phase:'just_ended',text:'刚结束，好好休息~',icon:'🩷'}; return{phase:'normal',text:`下次预计 ${next.getMonth()+1}月${next.getDate()}日~`,icon:'✨'}; }
+    return{phase:'normal',text:'一切安好~',icon:'✨'};
+  },
+
+  _randomTip(phase){ const t=this.CARE_TIPS[phase]||this.CARE_TIPS.normal; return t[Math.floor(Math.random()*t.length)]; },
+
+  render(el){
+    const st=this.getStatus(),tip=this._randomTip(st.phase);
+    let h=`<div class="period-phase">${st.icon} ${st.text}</div>`;
+    if(st.phase==='upcoming') h+=`<div style="margin-top:4px;font-size:0.82rem;color:#D06060">⚠️ 还有几天就到日子啦，提前准备~</div>`;
+    h+=`<div class="period-next">${tip}</div>`+this._renderCal();
+    el.innerHTML=h;
+  },
+
+  _renderCal(){
+    const now=new Date(),y=now.getFullYear(),m=now.getMonth(),td=now.getDate();
+    const fd=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate(),pdm=new Date(y,m,0).getDate();
+    const dn=['日','一','二','三','四','五','六'];
+    const pd=new Set(),prd=new Set();
+    for(const r of this.records){ const s=new Date(r.startDate),e=r.endDate?new Date(r.endDate):new Date(s); if(!r.endDate) e.setDate(e.getDate()+this.avgDuration); for(let d=new Date(s);d<=e;d.setDate(d.getDate()+1)){ if(d.getMonth()===m&&d.getFullYear()===y) pd.add(d.getDate()); } }
+    const next=this.predictNext(); if(next&&next.getMonth()===m&&next.getFullYear()===y){ for(let i=0;i<this.avgDuration;i++){ const d=new Date(next); d.setDate(d.getDate()+i); if(d.getMonth()===m) prd.add(d.getDate()); } }
+    let cells='';
+    for(let i=fd-1;i>=0;i--) cells+=`<div class="cal-day other-month">${pdm-i}</div>`;
+    for(let d=1;d<=dim;d++){ let cls='cal-day'; if(d===td) cls+=' today'; if(pd.has(d)) cls+=' period-day'; else if(prd.has(d)) cls+=' predicted-day'; cells+=`<div class="${cls}">${d}</div>`; }
+    return`<div class="period-calendar">${dn.map(n=>`<div class="cal-header">${n}</div>`).join('')}${cells}</div><div style="display:flex;gap:10px;font-size:0.7rem;color:var(--text-sub);justify-content:center"><span>🔴 经期</span><span>🟠 预测</span></div>`;
+  },
+
+  renderSettings(formEl){
+    formEl.innerHTML=`<div class="settings-section"><h3>🌸 生理期记录</h3><div class="settings-row"><input id="period-start" type="date"><input id="period-end" type="date" placeholder="结束日期(可选)"></div><div style="font-size:0.82rem;color:var(--text-sub);margin-bottom:6px">症状（可多选）：</div><div class="symptom-list" id="symptom-list">${this.SYMPTOMS.map(s=>`<span class="symptom-chip" data-symptom="${s}">${s}</span>`).join('')}</div><div class="settings-row" style="margin-top:8px"><button id="add-period-btn">记录本次</button></div><div id="period-list" style="margin-top:10px"></div></div>`;
+    const sel=new Set();
+    formEl.querySelectorAll('.symptom-chip').forEach(ch=>{ ch.addEventListener('click',()=>{const s=ch.dataset.symptom; if(sel.has(s)){sel.delete(s);ch.classList.remove('selected')}else{sel.add(s);ch.classList.add('selected')}}); });
+    this._renderList(document.getElementById('period-list'));
+    document.getElementById('add-period-btn').addEventListener('click',()=>{
+      const sd=document.getElementById('period-start').value; if(!sd) return;
+      this.addRecord(sd,document.getElementById('period-end').value,[...sel]);
+      this._renderList(document.getElementById('period-list'));
+      document.getElementById('period-start').value='';document.getElementById('period-end').value='';
+      sel.clear();formEl.querySelectorAll('.symptom-chip').forEach(c=>c.classList.remove('selected'));
+    });
+  },
+
+  _renderList(el){
+    el.innerHTML=this.records.length===0?'<div style="color:var(--text-sub);font-size:0.85rem">还没有记录~</div>':this.records.slice().reverse().map((r,i)=>`<div style="font-size:0.85rem;padding:6px 0;border-bottom:1px solid #f0ebe0;display:flex;justify-content:space-between;align-items:center"><span>📅 ${r.startDate}${r.endDate?' → '+r.endDate:''} ${r.symptoms.length>0?'· '+r.symptoms.join(','):''}</span><button onclick="Period.removeRecord(${this.records.length-1-i});Period._renderList(document.getElementById('period-list'))" class="delete-btn">删除</button></div>`).join('');
+  }
+};
+
+/* ========== Exam ========== */
+const Exam={
+  exams:[],
+  async load(){ this.exams=await Sync.loadMyData('exams',[]); },
+  async save(){ await Sync.setMyData('exams',this.exams); },
+
+  getClass(dl){ return dl<7?'urgent':dl<=30?'mid':'safe'; },
+
+  render(el){
+    if(this.exams.length===0){ el.innerHTML='<div style="color:var(--text-sub);font-size:0.9rem;text-align:center;padding:8px 0">还没有添加考试~</div>'; return; }
+    const today=new Date(); today.setHours(0,0,0,0);
+    const sorted=[...this.exams].sort((a,b)=>new Date(a.examDate)-new Date(b.examDate));
+    el.innerHTML=sorted.map(e=>{
+      const dl=Math.ceil((new Date(e.examDate)-today)/86400000);
+      const cls=this.getClass(dl),done=e.tasks.filter(t=>t.done).length,total=e.tasks.length;
+      const pct=total>0?Math.round(done/total*100):0;
+      return`<div class="exam-item" data-exam="${e.id}" onclick="Exam.toggleTasks(${e.id})"><div style="display:flex;justify-content:space-between;align-items:center"><span class="exam-subject">${e.subject}</span><span class="exam-countdown ${cls}">${dl<=0?'今天！':dl+'天'}</span></div><div class="exam-progress"><div class="exam-progress-bar" style="width:${pct}%"></div></div><div style="font-size:0.75rem;color:var(--text-sub);margin-top:2px">${done}/${total} 任务完成</div><div class="exam-tasks" id="tasks-${e.id}">${e.tasks.map(t=>`<div style="padding:4px 0;font-size:0.85rem"><input type="checkbox" ${t.done?'checked':''} onchange="Exam.toggleTask(${e.id},${t.id})" onclick="event.stopPropagation()"> ${t.text}</div>`).join('')}<div style="margin-top:6px;display:flex;gap:6px"><input id="task-input-${e.id}" placeholder="添加任务..." style="flex:1;padding:6px 10px;border:1px solid #e8d8d0;border-radius:6px;font-size:0.82rem"><button onclick="event.stopPropagation();Exam.addTask(${e.id})" style="padding:6px 12px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.8rem">+</button></div></div></div>`;
+    }).join('');
+  },
+
+  toggleTasks(id){ const el=document.getElementById('tasks-'+id); if(el) el.classList.toggle('open'); },
+  toggleTask(eid,tid){ const e=this.exams.find(x=>x.id===eid); if(!e) return; const t=e.tasks.find(x=>x.id===tid); if(t) t.done=!t.done; this.save(); this.render(document.getElementById('exam-display')); },
+  addTask(eid){ const e=this.exams.find(x=>x.id===eid); if(!e) return; const inp=document.getElementById('task-input-'+eid); if(!inp||!inp.value.trim()) return; e.tasks.push({id:Date.now(),text:inp.value.trim(),done:false}); inp.value=''; this.save(); this.render(document.getElementById('exam-display')); },
+
+  renderSettings(formEl){
+    formEl.innerHTML=`<div class="settings-section"><h3>📝 考试管理</h3><div class="settings-row"><input id="exam-subject" placeholder="科目"><input id="exam-date" type="date"></div><div class="settings-row"><button id="add-exam-btn">+ 添加考试</button></div><div id="exam-list" style="margin-top:10px"></div></div>`;
+    this._renderList(document.getElementById('exam-list'));
+    document.getElementById('add-exam-btn').addEventListener('click',()=>{
+      const s=document.getElementById('exam-subject').value.trim(),d=document.getElementById('exam-date').value;
+      if(!s||!d) return;
+      this.exams.push({id:Date.now(),subject:s,examDate:d,tasks:[]}); this.save();
+      this._renderList(document.getElementById('exam-list'));
+      document.getElementById('exam-subject').value='';document.getElementById('exam-date').value='';
+    });
+  },
+
+  _renderList(el){
+    el.innerHTML=this.exams.length===0?'<div style="color:var(--text-sub);font-size:0.85rem">还没有考试~</div>':this.exams.map(e=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:0.85rem;border-bottom:1px solid #f0ebe0"><span>📝 ${e.subject} · ${e.examDate}</span><button onclick="Exam.removeExam(${e.id})" class="delete-btn">删除</button></div>`).join('');
+  },
+
+  removeExam(id){ this.exams=this.exams.filter(e=>e.id!==id); this.save(); this._renderList(document.getElementById('exam-list')); }
+};
+
+/* ========== Diary ========== */
+const Diary={
+  entries:[],
+  _replies:{happy:['小狗也觉得今天超棒！汪汪~','看到你开心我就摇尾巴~','幸福会传递，你开心我也开心！','美好的心情要继续保持哦~','开心的话就去吃好吃的吧！','快乐的心情是世界上最好的东西~','你的笑容是小狗最大的幸福~','阳光和你一样灿烂！'],normal:['平凡的日子也闪闪发光呢~','每一天都是独一无二的~','平平安安就是最好的事~','小狗陪你度过平凡的每一天~','今天也要好好爱自己哦~','日子虽然普通，但你是特别的~','在平淡中发现美好吧~','普普通通也是一种幸福~'],sad:['抱抱~ 不开心的时候有我陪着你~','难过就哭出来，我在呢~','你要记住你是最棒的！','世界上有人偷偷爱着你哦~','雨过会天晴，你也会好起来的~','小狗的肩膀借你靠靠~','今天的不开心就留在今天吧~','相信我，明天会更好的~']},
+
+  async load(){ this.entries=await Sync.loadMyData('diary',[]); },
+  async save(){ await Sync.setMyData('diary',this.entries); },
+
+  _moodEmoji(m){ const map={happy:'😊',normal:'😐',sad:'😢'}; return map[m]||'😐'; },
+  _randomReply(mood){ const pool=this._replies[mood]||this._replies.normal; return pool[Math.floor(Math.random()*pool.length)]; },
+
+  render(el){
+    let h=`<div class="diary-form"><textarea id="diary-text" placeholder="今天想说什么呢..."></textarea><div class="diary-moods"><span class="diary-mood-btn selected" data-mood="happy" onclick="Diary.selectMood(this,'happy')">😊</span><span class="diary-mood-btn" data-mood="normal" onclick="Diary.selectMood(this,'normal')">😐</span><span class="diary-mood-btn" data-mood="sad" onclick="Diary.selectMood(this,'sad')">😢</span></div><div class="diary-actions"><button onclick="Diary.publish()" style="background:var(--accent-strong);color:#fff">发布</button></div></div><div id="diary-list">`;
+    const recent=this.entries.slice(-5).reverse();
+    if(recent.length===0) h+='<div style="color:var(--text-sub);font-size:0.85rem;text-align:center;padding:8px 0">还没有日记，写一条吧~</div>';
+    else h+=recent.map(e=>`<div class="diary-entry ${e.mood}"><div class="diary-content">${e.content}</div><div class="diary-reply">${e.reply||''}</div><div class="diary-meta"><span>${this._moodEmoji(e.mood)} ${new Date(e.createTime).toLocaleDateString('zh-CN')}</span><button onclick="Diary.remove(${e.id})" class="delete-btn">删除</button></div></div>`).join('');
+    h+='</div>'; el.innerHTML=h;
+  },
+
+  selectMood(el,mood){ el.parentElement.querySelectorAll('.diary-mood-btn').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); el.parentElement.dataset.mood=mood; },
+
+  async publish(){
+    const text=document.getElementById('diary-text').value.trim(); if(!text) return;
+    const moodEl=document.querySelector('.diary-mood-btn.selected');
+    const mood=moodEl?moodEl.dataset.mood:'normal';
+    this.entries.push({id:Date.now(),content:text,mood,createTime:new Date().toISOString(),reply:this._randomReply(mood)});
+    await this.save();
+    this.render(document.getElementById('diary-display'));
+  },
+
+  async remove(id){ this.entries=this.entries.filter(e=>e.id!==id); await this.save(); this.render(document.getElementById('diary-display')); }
+};
+
+/* ========== Photos ========== */
+const Photos={
+  photos:[],MAX_KB:4500,
+
+  async load(){ this.photos=await Sync.loadMyData('photos',[]); },
+  async save(){ await Sync.setMyData('photos',this.photos); },
+
+  render(el){
+    let h=`<div style="display:flex;gap:8px;margin-bottom:8px"><button id="photo-upload-btn" style="padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer">📷 上传照片</button><input type="text" id="photo-caption" placeholder="添加说明（可选）" style="flex:1;padding:8px;border:1px solid #e8d8d0;border-radius:8px;font-size:0.85rem"></div>`;
+    const used=this._storageUsed();
+    h+=`<div style="font-size:0.75rem;color:var(--text-sub);margin-bottom:8px">已用 ${used}KB / ${this.MAX_KB}KB</div>`;
+    if(this.photos.length===0) h+='<div style="color:var(--text-sub);font-size:0.85rem;text-align:center">还没有照片，上传一张吧~</div>';
+    else h+=`<div class="photo-grid">${this.photos.map(p=>`<div class="photo-item"><img src="${p.data}" alt="${p.caption||''}" onclick="Photos.showLightbox('${p.id}')"><div class="photo-caption">${p.caption||''}</div><button onclick="Photos.remove(${p.id})" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.5);color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:0.7rem">✕</button></div>`).join('')}</div>`;
+    el.innerHTML=h;
+
+    document.getElementById('photo-upload-btn').addEventListener('click',()=>{
+      const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+      inp.addEventListener('change',e=>{ const f=e.target.files[0]; if(f) this._upload(f); }); inp.click();
+    });
+  },
+
+  _storageUsed(){ let t=0; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k&&k.startsWith('couple_my_photos')) t+=(localStorage.getItem(k)||'').length; } return Math.round(t/1024); },
+
+  async _upload(file){
+    const reader=new FileReader();
+    reader.onload=async ev=>{
+      const img=new Image();
+      img.onload=async()=>{
+        const c=document.createElement('canvas'); const maxW=600; let w=img.width,h=img.height;
+        if(w>maxW){ h=h*maxW/w; w=maxW; }
+        c.width=w;c.height=h;
+        const ctx=c.getContext('2d'); ctx.drawImage(img,0,0,w,h);
+        let q=0.65,data; do{ data=c.toDataURL('image/jpeg',q); q-=0.1; }while(data.length>200*1024&&q>0.15);
+        const caption=document.getElementById('photo-caption').value.trim();
+        this.photos.push({id:Date.now(),data,caption,createTime:new Date().toISOString()});
+        await this.save();
+        this.render(document.getElementById('photo-display'));
+      }; img.src=ev.target.result;
+    }; reader.readAsDataURL(file);
+  },
+
+  showLightbox(id){ const p=this.photos.find(x=>x.id===id); if(!p) return; document.getElementById('lightbox-img').src=p.data; document.getElementById('lightbox-caption').textContent=p.caption||''; document.getElementById('photo-lightbox').classList.remove('hidden'); },
+
+  async remove(id){ if(!confirm('删除这张照片？')) return; this.photos=this.photos.filter(p=>p.id!==id); await this.save(); this.render(document.getElementById('photo-display')); }
+};
+
+/* ========== SOS ========== */
+const SOS={
+  contacts:[],
+  load(){ this.contacts=LS.get('sos_contacts',[]); },
+  save(){ LS.set('sos_contacts',this.contacts); },
+
+  render(){
+    const btn=document.getElementById('sos-button');
+    if(this.contacts.length>0){ btn.classList.add('visible'); btn.onclick=()=>this._showModal(); }
+    else btn.classList.remove('visible');
+  },
+
+  _showModal(){
+    const ov=document.createElement('div'); ov.className='sos-modal-overlay';
+    ov.innerHTML=`<div class="sos-modal"><h3>🆘 发送求助</h3><p style="margin:12px 0;font-size:0.9rem;color:var(--text-sub)">将向 ${this.contacts.length} 位联系人发送你的位置</p><div style="display:flex;gap:10px;justify-content:center"><button id="sos-cancel" style="padding:10px 20px;border:1px solid #ddd;border-radius:999px;background:var(--card-bg);cursor:pointer">取消</button><button id="sos-confirm" style="padding:10px 20px;background:#E84040;color:#fff;border:none;border-radius:999px;cursor:pointer">确认发送</button></div></div>`;
+    document.body.appendChild(ov);
+    ov.querySelector('#sos-cancel').addEventListener('click',()=>ov.remove());
+    ov.querySelector('#sos-confirm').addEventListener('click',()=>{ ov.remove(); this._send(); });
+  },
+
+  _send(){
+    if(!navigator.geolocation){ alert('你的设备不支持定位'); return; }
+    navigator.geolocation.getCurrentPosition(pos=>{
+      const{latitude,longitude}=pos.coords;
+      const body=`🆘 我需要帮助！\n位置: https://maps.google.com/?q=${latitude},${longitude}\n经纬度: ${latitude}, ${longitude}`;
+      const phones=this.contacts.map(c=>c.phone).filter(Boolean).join(',');
+      if(phones) window.location.href=`sms:${phones}?body=${encodeURIComponent(body)}`;
+      else alert('请先在设置中添加联系人手机号');
+    },()=>{ alert('无法获取位置，请检查定位权限'); },{enableHighAccuracy:true,timeout:10000});
+  },
+
+  renderSettings(formEl){
+    formEl.innerHTML=`<div class="settings-section"><h3>🆘 紧急联系人（最多3个）</h3><div id="sos-contacts-list"></div>${this.contacts.length<3?`<div class="settings-row" style="margin-top:8px"><input id="sos-name" placeholder="姓名"><input id="sos-phone" type="tel" placeholder="手机号"><button id="add-sos-btn">添加</button></div>`:''}</div>`;
+    this._renderList(document.getElementById('sos-contacts-list'));
+    const ab=document.getElementById('add-sos-btn'); if(ab) ab.addEventListener('click',()=>{ const n=document.getElementById('sos-name').value.trim(),p=document.getElementById('sos-phone').value.trim(); if(!n||!p) return; this.contacts.push({name:n,phone:p}); this.save(); this.renderSettings(formEl); });
+  },
+
+  _renderList(el){ el.innerHTML=this.contacts.length===0?'<div style="color:var(--text-sub);font-size:0.85rem">还没有联系人~</div>':this.contacts.map((c,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:0.85rem;border-bottom:1px solid #f0ebe0"><span>${c.name} · ${c.phone}</span><button onclick="SOS.removeContact(${i})" class="delete-btn">删除</button></div>`).join(''); },
+  removeContact(i){ this.contacts.splice(i,1); this.save(); SOS.renderSettings(document.getElementById('settings-form')); }
+};
+
+/* ========== Public Modules (Wishlist / Together / Anniversary) ========== */
+const Public={
+  wishlist:[],together:[],anniversary:null,
+
+  async load(){
+    const wSnap=await firebase.database().ref('public/wishlist').get(); this.wishlist=wSnap.val()?Object.entries(wSnap.val()).map(([k,v])=>({...v,key:k})):[];
+    const tSnap=await firebase.database().ref('public/together').get(); this.together=tSnap.val()?Object.entries(tSnap.val()).map(([k,v])=>({...v,key:k})):[];
+    const aSnap=await firebase.database().ref('public/anniversary').get(); this.anniversary=aSnap.val();
+  },
+
+  renderWishlist(el){
+    let h=`<div style="display:flex;gap:6px;margin-bottom:8px"><input id="wishlist-input" placeholder="添加愿望..." style="flex:1;padding:8px 12px;border:1px solid #e8d8d0;border-radius:8px;font-size:0.85rem"><button onclick="Public.addWish()" style="padding:8px 14px;background:var(--accent-strong);color:#fff;border:none;border-radius:8px;cursor:pointer">+</button></div>`;
+    if(this.wishlist.length===0) h+='<div style="color:var(--text-sub);font-size:0.85rem;text-align:center">一起写下愿望吧~</div>';
+    else h+=this.wishlist.map(w=>`<div class="wishlist-item"><span class="check ${w.done?'done':''}" onclick="Public.toggleWish('${w.key}',${!w.done})">${w.done?'✓':''}</span><span class="text ${w.done?'done':''}">${w.text}</span><button onclick="Public.removeWish('${w.key}')" class="delete-btn">✕</button></div>`).join('');
+    el.innerHTML=h;
+  },
+
+  async addWish(){ const inp=document.getElementById('wishlist-input'); if(!inp||!inp.value.trim()) return; await Sync.pushPublic('wishlist',{uid:myUid,text:inp.value.trim(),done:false,created:Date.now()}); inp.value=''; },
+
+  async toggleWish(key,done){ await Sync.setPublic('wishlist/'+key+'/done',done); },
+  async removeWish(key){ await firebase.database().ref('public/wishlist/'+key).remove(); },
+
+  renderTogether(el){
+    let h=`<div style="display:flex;gap:6px;margin-bottom:8px"><input id="together-input" placeholder="想一起做什么..." style="flex:1;padding:8px 12px;border:1px solid #e8d8d0;border-radius:8px;font-size:0.85rem"><button onclick="Public.addTogether()" style="padding:8px 14px;background:var(--accent-strong);color:#fff;border:none;border-radius:8px;cursor:pointer">+</button></div>`;
+    if(this.together.length===0) h+='<div style="color:var(--text-sub);font-size:0.85rem;text-align:center">一起计划要做的事吧~</div>';
+    else h+=this.together.map(t=>`<div class="together-item"><span class="check ${t.done?'done':''}" onclick="Public.toggleTogether('${t.key}',${!t.done})">${t.done?'✓':''}</span><span class="text ${t.done?'done':''}">${t.text}</span><button onclick="Public.removeTogether('${t.key}')" class="delete-btn">✕</button></div>`).join('');
+    el.innerHTML=h;
+  },
+
+  async addTogether(){ const inp=document.getElementById('together-input'); if(!inp||!inp.value.trim()) return; await Sync.pushPublic('together',{uid:myUid,text:inp.value.trim(),done:false,created:Date.now()}); inp.value=''; },
+  async toggleTogether(key,done){ await Sync.setPublic('together/'+key+'/done',done); },
+  async removeTogether(key){ await firebase.database().ref('public/together/'+key).remove(); },
+
+  renderAnniversary(el){
+    if(this.anniversary&&this.anniversary.date){
+      const d=new Date(this.anniversary.date),today=new Date(); today.setHours(0,0,0,0);
+      const diff=Math.ceil((d-today)/86400000);
+      el.innerHTML=`<div class="anniversary-label">${this.anniversary.title||'纪念日'}</div><div class="anniversary-countdown">${diff===0?'就是今天！🎉':diff>0?diff+'天':'已经 '+Math.abs(diff)+' 天'}</div><div style="text-align:center;font-size:0.78rem;color:var(--text-sub)">${this.anniversary.date}</div>`;
+    }else{
+      el.innerHTML=`<div style="text-align:center"><div class="settings-row"><input id="anniv-date" type="date"><input id="anniv-title" placeholder="纪念日名称"></div><button onclick="Public.setAnniversary()" class="btn-primary" style="margin-top:6px">设置纪念日</button></div>`;
+      // Bind only if inputs exist
+      setTimeout(()=>{ const btn=document.querySelector('#anniversary-display .btn-primary'); if(btn) btn.onclick=()=>Public.setAnniversary(); },0);
+    }
+  },
+
+  async setAnniversary(){
+    const date=document.getElementById('anniv-date')?.value,title=document.getElementById('anniv-title')?.value.trim();
+    if(!date) return;
+    this.anniversary={date,title:title||'纪念日'};
+    await Sync.setPublic('anniversary',this.anniversary);
+    this.renderAnniversary(document.getElementById('anniversary-display'));
+  }
+};
+
+/* ========== Notify ========== */
+const Notify={
+  timers:[],_countToday:0,
+
+  checkAndShow(){
+    const today=new Date().toDateString();
+    const last=LS.get('notify',{date:null,count:0});
+    if(last.date!==today){ last.date=today; last.count=0; }
+    this._countToday=last.count;
+    if(this._countToday>=2) return;
+
+    const morningMs=this._randomMs(8,12),afternoonMs=this._randomMs(14,21);
+    const now=Date.now(),midnight=new Date(); midnight.setHours(24,0,0,0);
+    const todayMs=midnight.getTime()-now;
+
+    if(this._countToday===0&&morningMs<todayMs){
+      this.timers.push(setTimeout(()=>this._fire(),morningMs));
+    }
+    if(this._countToday<=1&&afternoonMs<todayMs){
+      this.timers.push(setTimeout(()=>this._fire(),afternoonMs));
+    }
+  },
+
+  _randomMs(h1,h2){ const start=new Date(); start.setHours(h1,Math.floor(Math.random()*60),0,0); const end=new Date(); end.setHours(h2,0,0,0); const range=end.getTime()-start.getTime(); return Math.max(300000,start.getTime()+Math.random()*range-Date.now()); },
+
+  async _fire(){
+    const today=new Date().toDateString();
+    const last=LS.get('notify',{date:null,count:0});
+    if(last.date!==today){ last.date=today; last.count=0; }
+    if(last.count>=2) return;
+    last.count++; LS.set('notify',last);
+
+    const weather=Weather.cache;
+    const courses=Schedule.getToday().length;
+    const period=Period.getStatus();
+    const lastDiary=LS.get('my_diary',[]);
+    const mood=lastDiary.length>0?lastDiary[lastDiary.length-1].mood:null;
+    const exam=Exam.exams.length>0?Exam.exams.sort((a,b)=>new Date(a.examDate)-new Date(b.examDate))[0]:null;
+
+    let msg='';
+    if(weather){ if(parseInt(weather.icon)>=300) msg+='今天有雨🌧，带伞哦~ '; else if(parseInt(weather.temp)>30) msg+='今天很热☀️，多喝水~ '; else if(parseInt(weather.temp)<10) msg+='今天很冷❄️，注意保暖~ '; }
+    if(courses>0) msg+=`今天有${courses}节课。`;
+    if(period.phase==='during') msg+='生理期注意休息🌸 ';
+    if(period.phase==='upcoming') msg+='生理期快来了，提前准备~ ';
+    if(exam){ const dl=Math.ceil((new Date(exam.examDate)-new Date())/86400000); if(dl<=7&&dl>0) msg+=`${exam.subject}还有${dl}天！`; }
+    if(!msg) msg='今天也是美好的一天呢~';
+    this._toast(msg);
+    if('Notification' in window&&Notification.permission==='granted') new Notification('情侣空间',{body:msg,icon:'icon-192.png'});
+  },
+
+  _toast(msg){ const el=document.getElementById('notify-toast'); if(!el) return; el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),8000); }
+};
+
+/* ========== Puppy ========== */
+const Puppy={
+  el:null,speechEl:null,zoneEl:null,dragInfo:null,autoTimer:null,_suppressNextClick:false,
+  images:['cbfc6236affba6f248eb2f59b8f68807.png','88209427ab874a1ebfe951bff0013a3f.png','dc8ebbd3dd0345d7be3b211a676ebdf5.png','e954ddb4b60d468e855e67d9f609b495.png','6feaa2d3ec5e413b8762f294ff601bf7.png','6a6380774bd94fb2b9c8759a2cffad85.png','2bf16c1237a545468a415e8e9f6d8311.png','184eb9ce22b340aeb172f87e6500bc53.png','d31ed76b5c07400d9aca15489f9f4a76.png','c96024d9439f4b799f43bc88e208c5f2.png','3ed38fe8731c42058a922e97c0014a6a.png','f381ba1b375f4a3e9e133a05b54b7eff.png','70413328c0c943ed9b7971c78c105a80.png','3b922b73f6314bc7a327c8c17b9a623e.png','90c8ee71db9a407a83e2b40fd1df7b06.png'],
+
+  init(){
+    this.el=document.getElementById('puppy-img'); this.speechEl=document.getElementById('puppy-speech'); this.zoneEl=document.getElementById('puppy-zone');
+    this._injectStyles(); this.pickDaily(); this.bindEvents(); this.startAuto(); this._startSparkles();
+  },
+
+  pickDaily(){ const now=new Date(),start=new Date(now.getFullYear(),0,0),doy=Math.floor((now-start)/86400000); this.el.src=this.images[doy%this.images.length]; },
+
+  _injectStyles(){ if(document.getElementById('puppy-styles')) return; const s=document.createElement('style'); s.id='puppy-styles'; s.textContent=`#puppy-img.hop{animation:puppy-hop .55s ease}@keyframes puppy-hop{0%,100%{transform:translateY(0)}30%{transform:translateY(-22px)}55%{transform:translateY(0)}75%{transform:translateY(-8px)}}#puppy-img.wave{animation:puppy-wave .7s ease}@keyframes puppy-wave{0%{transform:rotate(0)}15%{transform:rotate(-8deg)}35%{transform:rotate(10deg)}55%{transform:rotate(-6deg)}75%{transform:rotate(8deg)}100%{transform:rotate(0)}}#puppy-img.wiggle{animation:puppy-wiggle .5s ease}@keyframes puppy-wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(6deg)}50%{transform:rotate(-6deg)}75%{transform:rotate(4deg)}}`; document.head.appendChild(s); },
+
+  bindEvents(){
+    this.el.addEventListener('touchstart',e=>this._dragStart(e),{passive:false});
+    this.el.addEventListener('touchmove',e=>this._dragMove(e),{passive:false});
+    this.el.addEventListener('touchend',e=>this._dragEnd(e));
+    this.el.addEventListener('mousedown',e=>this._dragStart(e));
+    document.addEventListener('mousemove',e=>this._dragMove(e));
+    document.addEventListener('mouseup',e=>this._dragEnd(e));
+    this.el.addEventListener('click',e=>{ if(this._suppressNextClick){this._suppressNextClick=false;return;} this.poke(); });
+  },
+
+  _dragStart(e){ e.preventDefault(); const p=e.touches?e.touches[0]:e; this.el.classList.add('dragging'); this.dragInfo={startX:p.clientX,startY:p.clientY,moved:false}; this._hideSpeech(); },
+  _dragMove(e){ if(!this.dragInfo) return; const p=e.touches?e.touches[0]:e,dx=p.clientX-this.dragInfo.startX,dy=p.clientY-this.dragInfo.startY; if(Math.abs(dx)>3||Math.abs(dy)>3) this.dragInfo.moved=true; this.el.style.transform=`translate(${Math.max(-80,Math.min(80,dx))}px,${Math.max(-60,Math.min(60,dy))}px)`; },
+  _dragEnd(e){ if(!this.dragInfo) return; if(this.dragInfo.moved) this._suppressNextClick=true; this.el.classList.remove('dragging'); this.el.style.transform='translate(0,0)'; this.dragInfo=null; setTimeout(()=>{this._suppressNextClick=false},100); },
+
+  poke(){
+    const an=['bounce','spin','wiggle'][Math.floor(Math.random()*3)];
+    const ph=['汪！','干嘛呀~','别戳啦！','好痒~','嘻嘻嘻','摸头！','你真好~','今天也很想你','最喜欢你啦','再来一次！'];
+    this.el.classList.remove('bounce','spin','wiggle','hop','wave'); void this.el.offsetWidth; this.el.classList.add(an);
+    this._popHeart(); this._showSpeech(ph[Math.floor(Math.random()*ph.length)]);
+    setTimeout(()=>this.el.classList.remove('bounce','spin','wiggle','hop','wave'),700);
+  },
+
+  _popHeart(){ const h=document.createElement('div'); h.className='heart-particle'; h.textContent=['❤️','💕','✨','💖','🩷','🌸','💫','🌟','🎀'][Math.floor(Math.random()*9)]; const r=this.zoneEl.getBoundingClientRect(); h.style.left=(r.width/2+(Math.random()-0.5)*60)+'px'; h.style.top=(r.height/2-40)+'px'; this.zoneEl.appendChild(h); setTimeout(()=>h.remove(),1200); },
+
+  _showSpeech(t){ this.speechEl.textContent=t; this.speechEl.classList.add('show'); setTimeout(()=>this.speechEl.classList.remove('show'),2500); },
+  _hideSpeech(){ this.speechEl.classList.remove('show'); },
+
+  startAuto(){ this.autoTimer=setInterval(()=>{ if(this.dragInfo) return; const r=Math.random(); if(r<0.25){ const t=(Math.random()-0.5)*18; this.el.style.transform=`rotate(${t}deg)`; setTimeout(()=>{if(!this.dragInfo&&!this.el.classList.contains('dragging')) this.el.style.transform='translate(0,0)'},2200); }else if(r<0.5){this.el.classList.add('hop');setTimeout(()=>this.el.classList.remove('hop'),600)}else if(r<0.65){this.el.classList.add('wave');setTimeout(()=>this.el.classList.remove('wave'),750)}else if(r<0.8){const sx=(Math.random()-0.5)*8,sy=(Math.random()-0.5)*6;this.el.style.transform=`translate(${sx}px,${sy}px)`;setTimeout(()=>{if(!this.dragInfo&&!this.el.classList.contains('dragging'))this.el.style.transform='translate(0,0)'},1800)}},12000); },
+
+  _startSparkles(){ const c=document.getElementById('sparkles'); if(!c) return; const em=['✨','⭐','💫','🌸','🩷','🎀','·','✧','˚','🫧']; const spawn=()=>{ const el=document.createElement('span');el.className='sparkle';el.textContent=em[Math.floor(Math.random()*em.length)];el.style.left=(Math.random()*90+5)+'%';el.style.top=(Math.random()*60+40)+'%';el.style.animationDuration=(6+Math.random()*10)+'s';el.style.fontSize=(0.5+Math.random()*1.2)+'rem';c.appendChild(el);setTimeout(()=>el.remove(),12000);}; spawn();spawn();spawn();setInterval(spawn,4000); }
+};
+
+/* ========== Messages ========== */
+const Messages={
+  get(h,weatherCode,courses,temp){
+    let cat='day'; if(h>=6&&h<9) cat='morning'; else if(h>=17&&h<21) cat='evening'; else if(h>=21||h<6) cat='night';
+    if(weatherCode&&weatherCode>=300&&weatherCode<500) cat='rain';
+    else if(temp!==undefined&&temp!==null){ if(temp>30) cat='hot'; else if(temp<10) cat='cold'; }
+    if(courses!==undefined){ if(courses>=5) cat='busy'; else if(courses<=1) cat='relax'; }
+    return this._pick(cat);
+  },
+  _pick(cat){
+    const pools={morning:['清晨的第一缕阳光，是今天的第一份礼物~','早安！今天也要元气满满地起床哦~','新的一天，新的可爱！','今天早上有你喜欢的那门课哦，打起精神来！'],day:['努力学习的你最迷人了~','如果累了就摸摸头，我在呢！','今天的你比昨天更聪明了一点点~','喝口水吧，你的大脑需要补充水分啦！'],evening:['今天辛苦了，奖励自己一杯热饮吧~','把所有烦恼都留在今天，明天拿快乐回来~','你已经做得很好了，真的！','晚霞好美，像你今天的心情一样温柔~'],night:['关掉手机，闭上眼睛，放松下来~','今天的你也超棒的，晚安！','夜深了，该跟今天说拜拜啦~','睡前喝一杯热牛奶，做个甜甜的梦~'],rain:['下雨天适合发呆，也适合想我~','窗外滴答滴答，是天空在给你弹小曲~','雨天最适合窝在被窝里了，羡慕！','出门记得带伞！淋湿了我会心疼的~'],busy:['今天课好多呀，记得中间休息一下！','课多说明你重要呀，大家都在抢着教你呢~','撑过今天，你就又强大了！','水壶带了吗？忙起来最容易忘记喝水了~'],relax:['惬意的一天，适合做点喜欢的事~','闲下来的时候就发发呆，那也是一种幸福~','今天节奏刚刚好，享受吧~','今天可以慢悠悠地吃早餐，不用赶时间~'],hot:['今天好热呀！记得多喝水~','出门一定要带遮阳伞，太阳公公今天太热情了！','天热的时候最适合喝冰镇柠檬水啦~','这么热的天还坚持上课，你简直是勇士！'],cold:['今天好冷呀！围巾手套帽子全部武装起来~','出门前喝一杯热水，让身体从里到外暖起来~','冷天最适合穿厚厚的，像个小团子一样可爱~','手冻僵了的话就搓一搓，哈一口热气~']};
+    const msgs=pools[cat]||pools.day; return msgs[Math.floor(Math.random()*msgs.length)];
+  }
+};
+
+/* ========== App ========== */
+const App={
+  shareSettings:{schedule:true,exam:true},
+
+  async init(){
+    // Load share settings
+    this.shareSettings=LS.get('share_settings',{schedule:true,exam:true});
+
+    // Init core
+    await Schedule.load();
+    await Period.load();
+    await Exam.load();
+    await Diary.load();
+    await Photos.load();
+    SOS.load();
+    await Public.load();
+
+    // Update online status
+    Sync.updateOnline();
+
+    // Render everything
+    this.updateGreeting();
+    this.updateWeather();
+    this.updateMessage();
+    this.updateSchedule();
+    this.updatePeriod();
+    this.updateFortune();
+    this.updateExam();
+    this.updateDiary();
+    this.updatePhotos();
+    this.updateSOS();
+    this.updatePublic();
+    this.updateShareToggles();
+
+    Puppy.init();
+
+    // Notifications
+    Notify.checkAndShow();
+    if('Notification' in window&&Notification.permission==='default'){
+      setTimeout(()=>Notification.requestPermission(),5000);
+    }
+
+    // Partner info
+    if(partnerUid) this.loadPartnerInfo();
+
+    // Settings modal
+    this.bindSettings();
+
+    // Timers
+    this.startTimers();
+  },
+
+  async updateGreeting(){
+    Greeting.update(document.getElementById('greeting-text'),document.getElementById('hero'));
+    if(Greeting.isLate()){
+      document.getElementById('warm-message').textContent='🌙 夜深了，该睡觉啦！明天还要美美的呢~';
+    }
+  },
+
+  async updateWeather(){
+    const el=document.getElementById('weather-card');
+    const data=await Weather.fetch();
+    if(data){
+      const icon=Weather.getIcon(data.icon);
+      const tip=Weather.getTip(data);
+      el.innerHTML=`<span>📍 芜湖湾沚</span><span>${icon} ${data.text} ${data.temp}°C</span><span>💧 ${data.humidity}%</span><span>💨 ${data.windScale}级</span>${tip?`<div class="weather-tip">${tip}</div>`:''}`;
+    }else el.innerHTML='<span>🌈 天气加载中...</span>';
+  },
+
+  updateMessage(){
+    const el=document.getElementById('warm-message');
+    const h=new Date().getHours();
+    const todayCourses=Schedule.getToday().length;
+    const w=Weather.cache;
+    el.textContent=Messages.get(h,w?parseInt(w.icon):null,todayCourses,w?parseInt(w.temp):null);
+    document.getElementById('refresh-message').onclick=()=>{ this.updateMessage(); el.style.animation='none'; void el.offsetWidth; el.style.animation='fortuneAppear 0.4s ease'; };
+  },
+
+  updateSchedule(){ Schedule.render(document.getElementById('today-schedule'),document.getElementById('next-class-countdown')); },
+  updatePeriod(){ Period.render(document.getElementById('period-status')); },
+
+  updateFortune(){
+    const el=document.getElementById('fortune-display');
+    const fortune=LS.get('my_fortune',null);
+    Fortune.render(el,fortune,
+      ()=>{ // on draw
+        const stick=Fortune.drawStick();
+        const result={date:new Date().toDateString(),stickId:stick.id,stick,lottery:null};
+        LS.set('my_fortune',result);
+        Sync.pushPublic('fortunes',{uid:myUid,role:myRole,timestamp:Date.now(),stickId:stick.id,stick,lottery:null});
+        this.updateFortune();
+      },
+      ()=>{ // on bonus lottery
+        const result=Fortune.drawLottery();
+        const tier=result.tier;
+        const item=result.item;
+        let f=LS.get('my_fortune');
+        f.lottery={tierId:tier.id,tierIdx:Fortune.lotteryTiers.indexOf(tier),tier,item};
+        LS.set('my_fortune',f);
+        const ref=firebase.database().ref('public/fortunes');
+        ref.orderByChild('uid').equalTo(myUid).limitToLast(1).once('value',snap=>{
+          snap.forEach(child=>{ child.ref.update({lottery:f.lottery}); });
+        });
+        this.updateFortune();
+      }
+    );
+    // Render partner fortune too
+    this.renderPartnerFortune();
+  },
+
+  async renderPartnerFortune(){
+    const el=document.getElementById('public-dynamic');
+    if(!partnerUid){ el.innerHTML='<div style="color:var(--text-sub);font-size:0.85rem;text-align:center">配对后可以看到TA的签文~</div>'; return; }
+    const snap=await firebase.database().ref('public/fortunes').orderByChild('timestamp').limitToLast(4).once('value');
+    const fortunes=[]; snap.forEach(c=>fortunes.push({key:c.key,...c.val()}));
+    fortunes.sort((a,b)=>b.timestamp-a.timestamp);
+    if(fortunes.length===0){ el.innerHTML='<div style="color:var(--text-sub);font-size:0.85rem;text-align:center">还没有抽签记录，快去摇一签吧~</div>'; return; }
+    let h='';
+    fortunes.forEach(f=>{
+      const isMine=f.uid===myUid;
+      const label=isMine?'我':ROLE_LABEL[f.role]||'TA';
+      h+=`<div class="partner-fortune"><div class="partner-fortune-label">${label} · ${new Date(f.timestamp).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}</div><div style="font-size:0.85rem;font-weight:650">第${f.stickId}签 · ${f.stick.level}</div>${f.lottery?`<div style="font-size:0.82rem;color:var(--accent-strong)">🎁 抽中奖了！</div>`:''}</div>`;
+    });
+    el.innerHTML=h;
+  },
+
+  updateExam(){ Exam.render(document.getElementById('exam-display')); },
+  updateDiary(){ Diary.render(document.getElementById('diary-display')); },
+  updatePhotos(){ Photos.render(document.getElementById('photo-display')); },
+  updateSOS(){ SOS.render(); },
+
+  updatePublic(){
+    Public.renderWishlist(document.getElementById('wishlist-display'));
+    Public.renderTogether(document.getElementById('together-display'));
+    Public.renderAnniversary(document.getElementById('anniversary-display'));
+  },
+
+  updateShareToggles(){
+    const sEl=document.getElementById('share-schedule');
+    if(sEl){ if(this.shareSettings.schedule) sEl.classList.add('on'); else sEl.classList.remove('on'); }
+    const eEl=document.getElementById('share-exam');
+    if(eEl){ if(this.shareSettings.exam) eEl.classList.add('on'); else eEl.classList.remove('on'); }
+  },
+
+  toggleShare(type){
+    this.shareSettings[type]=!this.shareSettings[type];
+    LS.set('share_settings',this.shareSettings);
+    this.updateShareToggles();
+  },
+
+  async loadPartnerInfo(){
+    if(!partnerUid) return;
+    const roleSnap=await firebase.database().ref('users/'+partnerUid+'/role').get();
+    const r=roleSnap.val();
+    if(r) document.getElementById('partner-name').textContent=(ROLE_EMOJI[r]||'')+' '+ROLE_LABEL[r];
+  },
+
+  async setMyMood(){
+    const moods=['😊','😍','🥰','😴','😤','😢','🤔','🎉','💪','🌧'];
+    const mood=prompt('设置心情：\n'+moods.join(' '),'😊');
+    if(mood){ await Sync.setMyData('mood',mood); }
+  },
+
+  refreshAll(){
+    this.updateSchedule(); this.updatePeriod(); this.updateExam(); this.updateDiary(); this.updatePhotos(); this.updateSOS(); this.updatePublic();
+  },
+
+  refreshPartnerData(){
+    this.renderPartnerFortune();
+  },
+
+  refreshPublicData(){
+    Public.load().then(()=>this.updatePublic());
+  },
+
+  bindSettings(){
+    const overlay=document.getElementById('settings-overlay');
+    document.getElementById('open-settings').addEventListener('click',()=>{ overlay.classList.remove('hidden'); this.renderSettings(); });
+    document.getElementById('close-settings').addEventListener('click',()=>{ overlay.classList.add('hidden'); this.refreshAll(); });
+    overlay.addEventListener('click',e=>{ if(e.target===overlay){ overlay.classList.add('hidden'); this.refreshAll(); } });
+  },
+
+  renderSettings(){
+    const tabs=document.getElementById('settings-tabs');
+    const formEl=document.getElementById('settings-form');
+    const tabDefs=[
+      {id:'tab-pair',label:'💑 配对',render:()=>this._renderPairSettings(formEl)},
+      {id:'tab-course',label:'📚 课程',render:()=>Schedule.renderSettings(formEl)},
+      {id:'tab-period',label:'🌸 生理',render:()=>Period.renderSettings(formEl)},
+      {id:'tab-exam',label:'📝 考试',render:()=>Exam.renderSettings(formEl)},
+      {id:'tab-diary',label:'📔 日记',render:()=>this._renderDiarySettings(formEl)},
+      {id:'tab-sos',label:'🆘 SOS',render:()=>SOS.renderSettings(formEl)},
+    ];
+    tabs.innerHTML=tabDefs.map((t,i)=>`<button class="settings-tab${i===0?' active':''}" data-tab="${t.id}">${t.label}</button>`).join('');
+    tabDefs[0].render();
+    tabs.querySelectorAll('.settings-tab').forEach(tab=>{
+      tab.addEventListener('click',()=>{
+        tabs.querySelectorAll('.settings-tab').forEach(t=>t.classList.remove('active'));
+        tab.classList.add('active');
+        const def=tabDefs.find(d=>d.id===tab.dataset.tab);
+        if(def) def.render();
+      });
+    });
+  },
+
+  _renderPairSettings(formEl){
+    const code=LS.get('pairCode','------');
+    formEl.innerHTML=`<div class="settings-section"><h3>💑 配对信息</h3><div class="pair-code-display"><div class="hint">我的配对码</div><div class="code">${code}</div><div class="hint">发给另一半，让TA输入</div></div><div style="margin-top:12px;font-size:0.85rem;color:var(--text-sub)">我的角色：${ROLE_EMOJI[myRole]||''} ${ROLE_LABEL[myRole]||'未设置'}</div><div style="margin-top:4px;font-size:0.85rem;color:var(--text-sub)">配对状态：${partnerUid?'已连接 💕':'等待配对...'}</div>${partnerUid?`<button onclick="App.unpair()" class="btn-primary" style="margin-top:12px;background:#D06060">解除配对</button>`:''}</div>`;
+  },
+
+  async unpair(){
+    if(!confirm('确定要解除配对吗？')) return;
+    if(partnerUid){ await firebase.database().ref('users/'+myUid+'/partnerUid').remove(); await firebase.database().ref('users/'+partnerUid+'/partnerUid').remove(); }
+    LS.remove('partnerUid'); partnerUid=null;
+    location.reload();
+  },
+
+  _renderDiarySettings(formEl){
+    formEl.innerHTML=`<div class="settings-section"><h3>📔 心情日记</h3><p style="font-size:0.85rem;color:var(--text-sub)">日记在主页面直接编写，这里查看所有历史日记。</p><div id="all-diary-list"></div></div>`;
+    const listEl=document.getElementById('all-diary-list');
+    if(Diary.entries.length===0) listEl.innerHTML='<div style="color:var(--text-sub);font-size:0.85rem">还没有日记~</div>';
+    else listEl.innerHTML=Diary.entries.reverse().map(e=>`<div style="padding:8px 0;border-bottom:1px solid #f0ebe0;display:flex;justify-content:space-between;align-items:center"><span style="font-size:0.85rem">${Diary._moodEmoji(e.mood)} ${e.content.slice(0,30)}...</span><span style="font-size:0.75rem;color:var(--text-sub)">${new Date(e.createTime).toLocaleDateString('zh-CN')}</span><button onclick="Diary.remove(${e.id});App._renderDiarySettings(document.getElementById('settings-form'))" class="delete-btn">删除</button></div>`).join('');
+  },
+
+  startTimers(){
+    setInterval(()=>{ this.updateGreeting(); this.updateSchedule(); },60000);
+    setInterval(()=>{ this.updateWeather(); },30*60*1000);
+    const now=new Date(),msToMidnight=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1).getTime()-now.getTime();
+    setTimeout(()=>{ this.updateFortune(); this.updateGreeting(); setInterval(()=>{this.updateFortune();this.updateGreeting()},24*60*60*1000); },msToMidnight+1000);
+  }
+};
+
+/* ========== Boot ========== */
+window.addEventListener('DOMContentLoaded',()=>{
+  // Lightbox close
+  document.getElementById('photo-lightbox').addEventListener('click',function(e){ if(e.target===this||e.target.classList.contains('lightbox-close')) this.classList.add('hidden'); });
+
+  // Start auth flow
+  Auth.init();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]: 💑
+    - generic [ref=e4]: 🐶 情侣空间 · 小窝 🐶
+    - generic [ref=e5]: 🐾 和你的另一半，共享每一天 🐾
+    - button "💙 我是男友" [ref=e6] [cursor=pointer]
+    - button "💗 我是女友" [ref=e7] [cursor=pointer]
+  - generic [ref=e8]:
+    - generic [ref=e9]: 你好呀~
+    - generic [ref=e10]: 🌈 天气加载中...
+  - img "线条小狗" [ref=e12]
+  - heading "🐾 每日灵签 🦴" [level=3] [ref=e14]:
+    - generic [ref=e15]: 🐾
+    - text: 每日灵签
+    - generic [ref=e16]: 🦴
+  - heading "🐾 摇签问卜 🦴" [level=3] [ref=e18]:
+    - generic [ref=e19]: 🐾
+    - text: 摇签问卜
+    - generic [ref=e20]: 🦴
+  - generic [ref=e21]:
+    - generic [ref=e22]: 今天也要开心哦~
+    - button "🔄 换一句" [ref=e24] [cursor=pointer]
+  - heading "🐾 今日课表 共享" [level=3] [ref=e26]:
+    - generic [ref=e27]: 🐾
+    - text: 今日课表
+    - generic [ref=e28] [cursor=pointer]: 共享
+  - heading "🐾 生理期小助手 🦴" [level=3] [ref=e31]:
+    - generic [ref=e32]: 🐾
+    - text: 生理期小助手
+    - generic [ref=e33]: 🦴
+  - heading "🐾 考试倒计时 共享" [level=3] [ref=e35]:
+    - generic [ref=e36]: 🐾
+    - text: 考试倒计时
+    - generic [ref=e37] [cursor=pointer]: 共享
+  - heading "🐾 心情日记 🦴" [level=3] [ref=e40]:
+    - generic [ref=e41]: 🐾
+    - text: 心情日记
+    - generic [ref=e42]: 🦴
+  - heading "🐾 照片墙 🦴" [level=3] [ref=e44]:
+    - generic [ref=e45]: 🐾
+    - text: 照片墙
+    - generic [ref=e46]: 🦴
+  - heading "🐾 共同愿望清单 🦴" [level=3] [ref=e48]:
+    - generic [ref=e49]: 🐾
+    - text: 共同愿望清单
+    - generic [ref=e50]: 🦴
+  - heading "🐾 一起做的事 🦴" [level=3] [ref=e52]:
+    - generic [ref=e53]: 🐾
+    - text: 一起做的事
+    - generic [ref=e54]: 🦴
+  - heading "🐾 纪念日 🦴" [level=3] [ref=e56]:
+    - generic [ref=e57]: 🐾
+    - text: 纪念日
+    - generic [ref=e58]: 🦴
+  - contentinfo [ref=e60]:
+    - generic [ref=e61]: 🐶 · · 🐾 · 🦴 · 🐾 · 🦴 · 🐾 · · 🐶
+    - button "⚙ 设置" [ref=e62] [cursor=pointer]

@@ -1,0 +1,7 @@
+node_modules
+server-data
+.git
+.netlify
+*.bat
+screenshot-final.png
+snapshot-test.txt
